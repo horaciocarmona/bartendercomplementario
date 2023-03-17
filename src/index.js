@@ -9,6 +9,7 @@ import { Router } from "express";
 //import {ManagerMessageMongoDB} from '../src/dao/MongoDB/models/Message.js'
 // no se hace porque debo consultar a dao
 import { getManagerMessages } from "../src/dao/daoManager.js";
+import { env } from "process";
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, "src/public/img");
@@ -52,11 +53,11 @@ app.post("/upload", upload.single("product"), (req, res) => {
 io.on("connection", (socket) => {
   socket.on("message", (info) => {
     console.log("se va a conectar");
-    managerMessage.addElements([info]).then(() => {
-      managerMessage.getElements().then((mensajes) => {
-        console.log(mensajes);
-        socket.emit("allMessages", mensajes);
+        managerMessage.addElements([info]).then(() => {
+        managerMessage.getElements().then((mensajes) => {
+          console.log(mensajes);
+          socket.emit("allMessages", mensajes);
+        });
       });
-    });
   });
 });
