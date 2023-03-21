@@ -1,4 +1,6 @@
 import mongoose from "mongoose";
+import paginate from "mongoose-paginate-v2"
+
 // url esta propiedad deberia ser primvada
 export class ManagerMongoDB {
   #url;
@@ -6,10 +8,11 @@ export class ManagerMongoDB {
     this.#url = url;
     this.collection = collection;
     this.schema = new mongoose.Schema(schema);
+    this.schema.plugin(paginate)
     this.model = mongoose.model(this.collection, this.schema);
   }
 
-  async #setConnection() {
+  async setConnection() {
     try {
       await mongoose.connect(this.#url);
       console.log("conectado a base MongoDB");
@@ -19,7 +22,7 @@ export class ManagerMongoDB {
   }
 
   async getElements() {
-    this.#setConnection();
+    this.setConnection();
     try {
       const elementos = await this.model.find();
       return elementos;
@@ -29,19 +32,25 @@ export class ManagerMongoDB {
   }
 
   async getElementById(id) {
-    this.#setConnection();
+    this.setConnection();
+    console.log("consulta de un elemento de MongoDb");
+
     try {
-      const elemento = await this.model.findById(id);
+      const elemento = await this.model.findById(
+        new mongoose.Types.ObjectId(id)
+      );
       return elemento;
     } catch (error) {
       console.log("error en consulta de un elemento de MongoDb", error);
     }
   }
 
-  async deleteElement(id) {
-    this.#setConnection();
+  async deleteElementById(id) {
+    this.setConnection();
     try {
-      const mensaje = await this.model.findByIdAndRemove(id);
+      const mensaje = await this.model.findByIdAndRemove(
+        new mongoose.Types.ObjectId(id)
+      );
       return mensaje;
     } catch (error) {
       console.log("error en eliminacion de un elemento de MongoDb", error);
@@ -49,9 +58,12 @@ export class ManagerMongoDB {
   }
 
   async updateElement(id, info) {
-    this.#setConnection();
+    this.setConnection();
     try {
-      const mensaje = await this.model.findByIdAndUpdate(id, info);
+      const mensaje = await this.model.findByIdAndUpdate(
+        new mongoose.Types.ObjectId(id),
+        info
+      );
       return mensaje;
     } catch (error) {
       console.log("error en modificacion de un elemento de MongoDb", error);
@@ -59,7 +71,7 @@ export class ManagerMongoDB {
   }
 
   async addElements(elementos) {
-    this.#setConnection();
+    this.setConnection();
     try {
       const mensaje = await this.model.insertMany(elementos);
       return mensaje;

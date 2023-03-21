@@ -3,6 +3,15 @@ import ManagerMessageMongoDB from "./MongoDB/models/Message.js";
 import ManagerMessagePostgresqlDB from "./Postgresql/models/Message.js";
 import ManagerMessageFileSystemDB from "./FileSystem/models/Message.js";
 
+import ManagerProductMongoDB from "./MongoDB/models/Product.js";
+import ManagerProductPostgresqlDB from "./Postgresql/models/Product.js";
+import ManagerProductFileSystemDB from "./FileSystem/models/Product.js";
+
+import ManagerCartMongoDB from "./MongoDB/models/Cart.js";
+import ManagerCartPostgresqlDB from "./Postgresql/models/Cart.js";
+import ManagerCartFileSystemDB from "./FileSystem/models/Cart.js";
+
+
 export const getManagerMessages = () => {
    let modelMessage=""
    switch (process.env.SELECTEDBDD) {
@@ -13,24 +22,32 @@ export const getManagerMessages = () => {
      case "3" : modelMessage= new ManagerMessageFileSystemDB();
              break;  
     }
-  // console.log(modelMessage)
-  // return modelMessage
-
-  // const modelMessage =
-  // process.env.SELECTEDBDD === 1
-  //   ? new ManagerMessageMongoDB()
-  //   : new ManagerMessagePostgresqlDB();
-
-return modelMessage;
-
+  return modelMessage;
 };
 
+
 export const getManagerProducts = () => {
-    const modelProducts =
-      process.env.SELECTEDBDD === 1
-        ? new ManagerProductMongoDB()
-        : new ManagerProductPostgresqlDB();
-  
-    return modelProducts;
-  };
-  
+  let modelProduct=""
+  switch (process.env.SELECTEDBDD) {
+    case "1" : modelProduct= new ManagerProductMongoDB();
+            break;  
+    case "2" : modelProduct= new ManagerProductPostgresqlDB();
+            break;  
+    case "3" : modelProduct= new ManagerProductFileSystemDB();
+            break;  
+   }
+  return modelProduct;
+};
+
+export const getManagerCarts = () => {
+  let modelCart=""
+  switch (process.env.SELECTEDBDD) {
+    case "1" : modelCart= new ManagerCartMongoDB();
+            break;  
+    case "2" : modelCart= new ManagerCartPostgresqlDB();
+            break;  
+    case "3" : modelCart= new ManagerCartFileSystemDB();
+            break;  
+   }
+  return modelCart;
+};

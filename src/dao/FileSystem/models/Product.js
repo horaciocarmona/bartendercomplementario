@@ -1,6 +1,6 @@
 import mongoose from 'mongoose'
 const {Schema}=mongoose
-import  {ManagerPostgresqlDB}  from "../../../db/postgresqlDBManager.js"
+import  {ManagerMongoDB}  from "../../../db/mongoDBManager.js"
 const productSchema = new Schema({
     title:{type:String,require:true,max:50,index:true},
     description:{type:String,require:true,max:50,index:true},
@@ -16,9 +16,9 @@ const productSchema = new Schema({
         default:'mediano'}
 })
 
-export default class ManagerProductPostgresqlDB extends ManagerPostgresqlDB {
+export default class ManagerProductMongoDB extends ManagerMongoDB {
     constructor(){
-        super(process.env.MONGODBURL,"products",productSchema)
+        super(process.env.MONGODBURL,"messages",messageSchema)
         //atributos propios
     }
     //metodos propios

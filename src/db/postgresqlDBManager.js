@@ -9,7 +9,7 @@ export class ManagerPostgresqlDB {
     this.model = mongoose.model(this.collection, this.schema);
   }
 
-  async #setConnection() {
+  async setConnection() {
     try {
       await mongoose.connect(this.#url);
       console.log("conectado a base MongoDB");
@@ -19,7 +19,7 @@ export class ManagerPostgresqlDB {
   }
 
   async getElements() {
-    this.#setConnection();
+    this.setConnection();
     try {
       const elementos = await this.model.find();
       return elementos;
@@ -29,7 +29,7 @@ export class ManagerPostgresqlDB {
   }
 
   async getElementById(id) {
-    this.#setConnection();
+    this.setConnection();
     try {
       const elemento = await this.model.findById(id);
       return elemento;
@@ -39,7 +39,7 @@ export class ManagerPostgresqlDB {
   }
 
   async deleteElement(id) {
-    this.#setConnection();
+    this.setConnection();
     try {
       const mensaje = await this.model.findByIdAndRemove(id);
       return mensaje;
@@ -49,7 +49,7 @@ export class ManagerPostgresqlDB {
   }
 
   async updateElement(id, info) {
-    this.#setConnection();
+    this.setConnection();
     try {
       const mensaje = await this.model.findByIdAndUpdate(id, info);
       return mensaje;
@@ -59,7 +59,7 @@ export class ManagerPostgresqlDB {
   }
 
   async addElements(elementos) {
-    this.#setConnection();
+    this.setConnection();
     try {
       const mensaje = await this.model.insertMany(elementos);
       return mensaje;

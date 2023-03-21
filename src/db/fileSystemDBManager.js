@@ -18,7 +18,7 @@ export class ManagerFileSystemDB {
       return this.idIncrement
     }
 
-    async #setConnection() {
+    async setConnection() {
         try {
           resultado = await fs.readFile(this.path,'utf-8')
           console.log("conectado a base FileSystem",resultado);
@@ -28,7 +28,7 @@ export class ManagerFileSystemDB {
       }
     
       async getElements() {
-        await this.#setConnection();
+        await this.setConnection();
         try {
           console.log("getelements",resultado)
           let elementos= JSON.parse(resultado)
@@ -39,7 +39,7 @@ export class ManagerFileSystemDB {
       }
 
       async getElementById(id) {
-        this.#setConnection();
+        this.setConnection();
         try {
           const elemento= JSON.parse(resultado).find(prod =>prod.id===id)
           return elemento;
@@ -49,7 +49,7 @@ export class ManagerFileSystemDB {
       }
     
       async deleteElement(id) {
-        this.#setConnection();
+        this.setConnection();
         let mensaje=""
         try {
             const elementos= JSON.parse(resultado)
@@ -69,7 +69,7 @@ export class ManagerFileSystemDB {
       }
       
       async updateElement(id,{...info}) {
-        this.#setConnection();
+        this.setConnection();
         let mensaje=""
         try {
             let elementos= JSON.parse(resultado)
@@ -93,7 +93,7 @@ export class ManagerFileSystemDB {
       }
     
       async addElements([{...elementos}]) {
-        await this.#setConnection();
+        await this.setConnection();
         let mensaje=""
         try {
           let id=0
