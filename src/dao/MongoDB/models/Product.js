@@ -17,7 +17,6 @@ const productSchema = new Schema({
 })
 export default class ManagerProductMongoDB extends ManagerMongoDB {
     constructor(){
-
       super(process.env.MONGODBURL,"products",productSchema)
       //atributos propios
     }
@@ -26,20 +25,14 @@ export default class ManagerProductMongoDB extends ManagerMongoDB {
         super.setConnection();
         try {
             console.log("consulta agregate",limit,page,filter,ord);
-//            const products = await this.model.paginate({filter:filter,limit:limit,page:page,sort:{price:ord}})
-            const products = await this.model.paginate({category:filter},{limit:2,page:3,sort:{price:0}})
-
+            const products = await this.model.paginate(filter,{limit:limit,page:page,sort:{price:ord}})
             return products;
         } catch (error) {
           console.log("error en consulta todos los elementos de MongoDb", error);
         }
       }
     //metodos propios
-//    async agregado() {
-//        const productModel=mongoose.model("products",productSchema)
-
-//        return productModel
-        // let ListProducts= await productModel.aggregate([
+        // let ListProducts= await this.model.aggregate([
         //     {$match:{category:query}
         //     },
         //     {$sort:{price:1}},

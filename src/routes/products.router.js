@@ -26,8 +26,8 @@ routerProd.get('/:pid',async (req,res)=>{
     let {limit}=req.query
     let {page}=req.query
     let {ord}=req.query
-    let {filter}=req.query
-
+    let {category}=req.query
+    let filter=""    
     if (!page) {
         page="1"
     }  
@@ -37,9 +37,11 @@ routerProd.get('/:pid',async (req,res)=>{
     if (!ord) {
         ord="0"
     }  
-    if (!filter) {
+    if (category) {
+        filter={category:req.query.category}
+    } else {
         filter=""
-    }  
+    } 
 
     const resultado= await productManager.getProducts(parseInt(limit),parseInt(page),filter,parseInt(ord))
     res.send(resultado)
