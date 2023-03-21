@@ -40,7 +40,7 @@ routerProd.get('/:pid',async (req,res)=>{
     if (category) {
         filter={category:req.query.category}
     } else {
-        filter=""
+        filter={}
     } 
 
     const resultado= await productManager.getProducts(parseInt(limit),parseInt(page),filter,parseInt(ord))

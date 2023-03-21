@@ -21,10 +21,10 @@ export default class ManagerProductMongoDB extends ManagerMongoDB {
       //atributos propios
     }
     async getProducts(limit,page,filter,ord) {
-
         super.setConnection();
         try {
-            console.log("consulta agregate",limit,page,filter,ord);
+            console.log("consulta paginate",limit,page,filter,ord);
+            // postman ejemplo ingreso de parametros para paginate limit 1 category mediano page 2 ord 1
             const products = await this.model.paginate(filter,{limit:limit,page:page,sort:{price:ord}})
             return products;
         } catch (error) {
