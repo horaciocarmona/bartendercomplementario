@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import cookieParser from "cookie-parser";
 import "dotenv/config";
 import express, { urlencoded } from "express";
 import { __dirname } from "./path.js";
@@ -27,6 +27,7 @@ const managerMessage = getManagerMessages();
 const app = express();
 
 //Midlewares
+app.use(cookieParser(process.env.SIGNED_COOKIE));
 app.use(express.json());
 app.use(urlencoded({ extended: true }));
 app.engine("handlebars", engine()); //configuracion de hbs
@@ -85,6 +86,14 @@ app.post("/upload", upload.single("product"), (req, res) => {
   console.log(req.file);
   res.send("Imagen cargada");
 });
+
+app.get('/setCookie',(req,res)=>{
+    res.cookie('CookieCookie','esto es una cookie',{maxAge:20000,signed:true}).send('Cookie')
+})
+
+app.get('/getCookie',(req,res)=>{
+  res.send(req.cookies)
+})
 
 app.get('/realTimeProducts',(req,res)=>{
   res.render('realTimeProducts',{
