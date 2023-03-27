@@ -60,6 +60,7 @@ export class ManagerMongoDB {
   async updateElement(id, info) {
     this.setConnection();
     try {
+      console.log(id,info)
       const mensaje = await this.model.findByIdAndUpdate(
         new mongoose.Types.ObjectId(id),
         info

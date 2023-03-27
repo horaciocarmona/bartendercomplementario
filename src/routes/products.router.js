@@ -1,6 +1,5 @@
 import {Router} from "express"
 import { getManagerProducts } from "../dao/daoManager.js"
-import ManagerProductMongoDB from "../dao/MongoDB/models/Product.js";
 
 const productManager = getManagerProducts();
 const routerProd=Router()
@@ -22,35 +21,12 @@ routerProd.get('/:pid',async (req,res)=>{
 
 //EndPoint todos los productos ruta\product ad product
  routerProd.get('/',async (req,res)=>{
-    console.log(`consulta todos los productos limit ${req.query}`)
-    let {limit}=req.query
-    let {page}=req.query
-    let {ord}=req.query
-    let {category}=req.query
-    let filter=""    
-    if (!page) {
-        page="1"
-    }  
-    if (!limit) {
-        limit="10"
-    }  
-    if (!ord) {
-        ord="0"
-    }  
-    if (category) {
-        filter={category:req.query.category}
-    } else {
-        filter={}
-    } 
-
-    const resultado= await productManager.getProducts(parseInt(limit),parseInt(page),filter,parseInt(ord))
+    console.log(`consulta con limit page category name sort}`)
+    const {page="1",limit="10",sort="0",category="",title=""}=req.query
+    let ord="0";
+    ord = (!sort) ? "0" : (sort==='asc') ? "1" : "-1"
+    const resultado= await productManager.getProducts(parseInt(limit),parseInt(page),title,category,parseInt(ord))
     res.send(resultado)
-
-    //  if (limit) {
-    // } else {
-    //     limit="10"
-    //  }
-//     res.send(ListProducts.slice(0,parseInt((limit) ? limit:"10")))
 })
 
 
