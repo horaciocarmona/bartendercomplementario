@@ -11,43 +11,50 @@ import ManagerCartMongoDB from "./MongoDB/models/Cart.js";
 import ManagerCartPostgresqlDB from "./Postgresql/models/Cart.js";
 import ManagerCartFileSystemDB from "./FileSystem/models/Cart.js";
 
-
 export const getManagerMessages = () => {
-   let modelMessage=""
-   switch (process.env.SELECTEDBDD) {
-     case "1" : modelMessage= new ManagerMessageMongoDB();
-             break;  
-     case "2" : modelMessage= new ManagerMessagePostgresqlDB();
-             break;  
-     case "3" : modelMessage= new ManagerMessageFileSystemDB();
-             break;  
-    }
+  let modelMessage = "";
+  switch (process.env.SELECTEDBDD) {
+    case "1":
+      modelMessage = new ManagerMessageMongoDB();
+      break;
+    case "2":
+      modelMessage = new ManagerMessagePostgresqlDB();
+      break;
+    case "3":
+      modelMessage = new ManagerMessageFileSystemDB();
+      break;
+  }
   return modelMessage;
 };
 
-
 export const getManagerProducts = () => {
-  let modelProduct=""
+  let modelProduct = "";
   switch (process.env.SELECTEDBDD) {
-    case "1" : modelProduct= new ManagerProductMongoDB();
-            break;  
-    case "2" : modelProduct= new ManagerProductPostgresqlDB();
-            break;  
-    case "3" : modelProduct= new ManagerProductFileSystemDB();
-            break;  
-   }
+    case "1":
+      modelProduct = new ManagerProductMongoDB();
+      break;
+    case "2":
+      modelProduct = new ManagerProductPostgresqlDB();
+      break;
+    case "3":
+      modelProduct = new ManagerProductFileSystemDB();
+      break;
+  }
   return modelProduct;
 };
 
 export const getManagerCarts = () => {
-  let modelCart=""
+  let modelCart = "";
   switch (process.env.SELECTEDBDD) {
-    case "1" : modelCart= new ManagerCartMongoDB();
-            break;  
-    case "2" : modelCart= new ManagerCartPostgresqlDB();
-            break;  
-    case "3" : modelCart= new ManagerCartFileSystemDB();
-            break;  
-   }
+    case "1":
+      modelCart = new ManagerCartMongoDB();
+      break;
+    case "2":
+      modelCart = new ManagerCartPostgresqlDB();
+      break;
+    case "3":
+      modelCart = new ManagerCartFileSystemDB();
+      break;
+  }
   return modelCart;
 };

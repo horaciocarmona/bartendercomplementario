@@ -1,8 +1,8 @@
 import { Router } from "express";
-const routerSocket=Router()
+const routerSocket = Router();
 
-routerSocket.get('/',(req,res)=>{
-    res.render('index',{})
-})
+routerSocket.get("/", (req, res) => {
+  res.render("index", {});
+});
 
-export default routerSocket
+export default routerSocket;

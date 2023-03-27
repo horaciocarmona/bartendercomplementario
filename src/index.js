@@ -1,15 +1,17 @@
 import cookieParser from "cookie-parser";
+
 import "dotenv/config";
 import express, { urlencoded } from "express";
+import session from "express-session";
 import { __dirname } from "./path.js";
 import multer from "multer";
 import { engine } from "express-handlebars"; //server simple
 import * as path from "path";
 import { Server } from "socket.io";
 import { Router } from "express";
-import routerProd from '../src/routes/products.router.js'
-import routerCart from '../src/routes/carts.router.js'
-import routerSocket from '../src/routes/socket.router.js'
+import routerProd from "../src/routes/products.router.js";
+import routerCart from "../src/routes/carts.router.js";
+import routerSocket from "../src/routes/socket.router.js";
 //import {ManagerMessageMongoDB} from '../src/dao/MongoDB/models/Message.js'
 // no se hace porque debo consultar a dao
 import { getManagerMessages } from "../src/dao/daoManager.js";
@@ -30,6 +32,21 @@ const app = express();
 app.use(cookieParser(process.env.SIGNED_COOKIE));
 app.use(express.json());
 app.use(urlencoded({ extended: true }));
+// app.use(
+//   session({
+//     secret: process.env.SESSION_SECRET,
+//     resave: true,
+//     saveUninitialized: true,
+//   })
+// );
+
+// function auth(req, res, next) {
+//   if (req.session?.email === "admin@admin.com") {
+//     return next();
+//   }
+//   return res.send("no tenes acceso a esta ruta");
+// }
+
 app.engine("handlebars", engine()); //configuracion de hbs
 app.set("view engine", "handlebars");
 app.set("views", path.resolve(__dirname, "./views"));
@@ -38,8 +55,8 @@ app.set("port", process.env.PORT || 5000);
 //Routers
 app.use("/", express.static(__dirname + "/public"));
 app.use("/", routerSocket);
-app.use('/api/products',routerProd)
-app.use('/api/carts',routerCart)
+app.use("/api/products", routerProd);
+app.use("/api/carts", routerCart);
 
 // //Carga de Productos
 //  const start = async ()=>{
@@ -73,8 +90,6 @@ app.use('/api/carts',routerCart)
 //  }
 //  start()
 
-
-
 // Uso de Servidor io
 const server = app.listen(app.get("port"), () =>
   console.log(`
@@ -87,39 +102,71 @@ app.post("/upload", upload.single("product"), (req, res) => {
   res.send("Imagen cargada");
 });
 
-app.get('/setCookie',(req,res)=>{
-    res.cookie('CookieCookie','esto es una cookie',{maxAge:20000,signed:true}).send('Cookie')
-})
+//Endpoint cookies
+// app.get("/setCookie", (req, res) => {
+//   res
+//     .cookie("CookieCookie", "esto es una cookie", {
+//       maxAge: 20000,
+//       signed: true,
+//     })
+//     .send("Cookie");
+// });
 
-app.get('/getCookie',(req,res)=>{
-  res.send(req.cookies)
-})
+// app.get("/getCookie", (req, res) => {
+//   res.send(req.signedCookies);
+// });
 
-app.get('/realTimeProducts',(req,res)=>{
-  res.render('realTimeProducts',{
-      listProducts
-  })
-})
+//Endpoint session
+// app.get("/session", (req, res) => {
+//   if (req.session.counter) {
+//     req.session.counter++;
+//     res.send(`has entrado ${req.session.counter} de veces`);
+//   } else {
+//     req.session.counter = 1;
+//     res.send("hola");
+//   }
+// });
+
+// app.get("/login", (req, res) => {
+//   const { email, password } = req.body;
+//   if (email == "admin@admin.com" && password == "1234") {
+//     req.session.email = email;
+//     req.session.password = password;
+//     return res.send("login");
+//   }
+//   return res.send("login fallido");
+// });
+
+// app.get("/logout", (req, res) => {
+//   req.session.destroy((error) => {
+//     res.send("salio");
+//   });
+// });
+
+// app.get("/admin", auth, (req, res) => {
+//   res.send("sos el admin");
+// });
+
+app.get("/realTimeProducts", (req, res) => {
+  res.render("realTimeProducts", {
+    listProducts,
+  });
+});
 
 const io = new Server(server);
 
-
 routerSocket.get("/", (req, res) => {
-
   //  const deviceWidth="50%"
-//    res.render("chat", {deviceWidth});
-    // res.render('home',{
-    //     tituloAlta:"Alta de Producto",
-    //     tituloEliminacion:"Eliminar Producto",
-    //     mensaje:"mundo"
-
-    // })
+  //    res.render("chat", {deviceWidth});
+  // res.render('home',{
+  //     tituloAlta:"Alta de Producto",
+  //     tituloEliminacion:"Eliminar Producto",
+  //     mensaje:"mundo"
+  // })
 });
 
-
-
 io.on("connection", (socket) => {
-    socket.on("message", (info) => {
+  socket.on("message", (info) => {
     console.log("se va a conectar");
     // managerMessage.addElements([info]).then(() => {
     //      managerMessage.getElements().then((mensajes) => {
@@ -127,5 +174,5 @@ io.on("connection", (socket) => {
     //       socket.emit("allMessages", mensajes);
     //     });
     //   });
-    });
+  });
 });
