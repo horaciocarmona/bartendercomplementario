@@ -1,5 +1,7 @@
 import cookieParser from "cookie-parser";
-
+//import  fileStore  from "session-file-store";
+import routerSession from "../src/routes/session.router.js";
+import MongoStore from "connect-mongo";
 import "dotenv/config";
 import express, { urlencoded } from "express";
 import session from "express-session";
@@ -27,25 +29,34 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 const managerMessage = getManagerMessages();
 const app = express();
+//const fileStorage=fileStore(session)
 
 //Midlewares
 app.use(cookieParser(process.env.SIGNED_COOKIE));
 app.use(express.json());
 app.use(urlencoded({ extended: true }));
-// app.use(
-//   session({
-//     secret: process.env.SESSION_SECRET,
-//     resave: true,
-//     saveUninitialized: true,
-//   })
-// );
+ app.use(
+   session({
+//   lugar de guardado time to live intentos de lectura      
+//     store : new fileStorage({path:'./sessions',ttl:30000,retries:1}),
+    store: MongoStore.create({
+        mongoUrl:process.env.MONGODBURL,
+        mongoOptions:{useNewUrlParser:true,useUnifiedTopology:true},
+        ttl:30,
+    }),
+     secret: process.env.SESSION_SECRET,
+     resave: true,
+     saveUninitialized: true,
 
-// function auth(req, res, next) {
-//   if (req.session?.email === "admin@admin.com") {
-//     return next();
-//   }
-//   return res.send("no tenes acceso a esta ruta");
-// }
+   })
+ );
+
+ function auth(req, res, next) {
+   if (req.session?.email === "admin@admin.com") {
+     return next();
+   }
+   return res.send("no tenes acceso a esta ruta");
+ }
 
 app.engine("handlebars", engine()); //configuracion de hbs
 app.set("view engine", "handlebars");
@@ -57,6 +68,7 @@ app.use("/", express.static(__dirname + "/public"));
 app.use("/", routerSocket);
 app.use("/api/products", routerProd);
 app.use("/api/carts", routerCart);
+app.use("/api/session",routerSession)
 
 // //Carga de Productos
 //  const start = async ()=>{
@@ -103,49 +115,59 @@ app.post("/upload", upload.single("product"), (req, res) => {
 });
 
 //Endpoint cookies
-// app.get("/setCookie", (req, res) => {
-//   res
-//     .cookie("CookieCookie", "esto es una cookie", {
-//       maxAge: 20000,
-//       signed: true,
-//     })
-//     .send("Cookie");
-// });
+ app.get("/setCookie", (req, res) => {
+   res.cookie("CookieCookie", "esto es una cookie", {
+       maxAge: 20000,
+       signed: true,
+     })
+     .send("Cookie");
+ });
 
-// app.get("/getCookie", (req, res) => {
-//   res.send(req.signedCookies);
-// });
+ app.get("/getCookie", (req, res) => {
+   res.send(req.signedCookies);
+ });
 
 //Endpoint session
-// app.get("/session", (req, res) => {
-//   if (req.session.counter) {
-//     req.session.counter++;
-//     res.send(`has entrado ${req.session.counter} de veces`);
-//   } else {
-//     req.session.counter = 1;
-//     res.send("hola");
-//   }
-// });
+ app.get("/session", (req, res) => {
+   if (req.session.counter) {
+     req.session.counter++;
+     res.send(`has entrado ${req.session.counter} de veces`);
+   } else {
+     req.session.counter = 1;
+     res.send("hola");
+   }
+ });
 
-// app.get("/login", (req, res) => {
-//   const { email, password } = req.body;
-//   if (email == "admin@admin.com" && password == "1234") {
-//     req.session.email = email;
-//     req.session.password = password;
-//     return res.send("login");
-//   }
-//   return res.send("login fallido");
-// });
+ app.get("/login", (req, res) => {
+   const { email, password } = req.body;
+   if (email == "adminCoder@coder.com" && password == "adminCod3r123") {
+     req.session.email = email;
+     req.session.password = password;
+     req.session.rol = 'admin';
+     return res.send("login");
+   } else {
+      if((email) && (password)) {
+        req.session.email = email;
+        req.session.password = password;
+        req.session.rol = 'user';
+        return res.send("login");
+   
+      } else {
+        return res.send("login fallido");
+      }   
+   }
+ });
 
-// app.get("/logout", (req, res) => {
-//   req.session.destroy((error) => {
-//     res.send("salio");
-//   });
-// });
+ app.get("/logout", (req, res) => {
+   req.session.destroy((error) => {
+     res.send("salio");
+   });
+ });
 
-// app.get("/admin", auth, (req, res) => {
+//  app.get("/admin", auth, (req, res) => {
+//   req.session.rol = 'admin';
 //   res.send("sos el admin");
-// });
+//  });
 
 app.get("/realTimeProducts", (req, res) => {
   res.render("realTimeProducts", {
