@@ -1,0 +1,14 @@
+<h1>
+    bienvenido usuario
+    <p>{{user.first_name}}</p>
+    <p>{{user.last_name}}</p>
+</h1>
+<div>
+    <ul id="message">
+        {{message}}
+    </ul>    
+    <form action='/api/session/logout' method='get'>
+        <button type="submit" id="deslogeo">deslogeo</button> 
+    </form>
+
+</div>

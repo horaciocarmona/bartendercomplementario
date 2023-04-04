@@ -1,10 +1,9 @@
 import {Router} from "express"
-import { getSession,testLogin,destroySession,register,home } from "../controllers/session.controler.js"
+import { getSession,destroySession,testLogin,product} from "../controllers/session.controller.js"
 const routerSession=Router()
-routerSession.get('/',getSession)
-routerSession.post('/login',testLogin)
-routerSession.get('/home',home)
-routerSession.get('/logout',destroySession)
-routerSession.get('/register',register)
-
+routerSession.get('/', getSession)
+routerSession.get('/login', getSession)
+routerSession.post('/testlogin', testLogin)
+routerSession.get('/logout', destroySession)
+routerSession.get('/product', product)
 export default routerSession

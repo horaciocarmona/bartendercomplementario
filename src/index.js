@@ -13,6 +13,7 @@ import { Server } from "socket.io";
 import { Router } from "express";
 import routerProd from "../src/routes/products.router.js";
 import routerCart from "../src/routes/carts.router.js";
+import routerUser from "../src/routes/user.router.js";
 import routerSocket from "../src/routes/socket.router.js";
 //import {ManagerMessageMongoDB} from '../src/dao/MongoDB/models/Message.js'
 // no se hace porque debo consultar a dao
@@ -51,6 +52,15 @@ app.use(urlencoded({ extended: true }));
    })
  );
 
+ function requireLogin(req, res, next) {
+  console.log('requirelogin',req.session.user)
+  if (!req.session.user) {
+    console.log('redirectlogin',req.session.user)
+    return res.redirect('/api/users/login');
+    }
+    next();
+  }
+
  function auth(req, res, next) {
    if (req.session?.email === "admin@admin.com") {
      return next();
@@ -69,6 +79,7 @@ app.use("/", routerSocket);
 app.use("/api/products", routerProd);
 app.use("/api/carts", routerCart);
 app.use("/api/session",routerSession)
+app.use("/api/users",routerUser)
 
 // //Carga de Productos
 //  const start = async ()=>{
@@ -114,6 +125,12 @@ app.post("/upload", upload.single("product"), (req, res) => {
   res.send("Imagen cargada");
 });
 
+
+// const source = document.getElementById('formulario-template').innerHTML;
+// const template = Handlebars.compile(source);
+// const html = template(context);
+// document.getElementById('formulario-container').innerHTML = html;
+
 //Endpoint cookies
  app.get("/setCookie", (req, res) => {
    res.cookie("CookieCookie", "esto es una cookie", {
@@ -127,42 +144,48 @@ app.post("/upload", upload.single("product"), (req, res) => {
    res.send(req.signedCookies);
  });
 
-//Endpoint session
- app.get("/session", (req, res) => {
-   if (req.session.counter) {
-     req.session.counter++;
-     res.send(`has entrado ${req.session.counter} de veces`);
-   } else {
-     req.session.counter = 1;
-     res.send("hola");
-   }
- });
+// app.get("/session", (req, res) => {
+//     const deviceWidth="50%"
+//     res.render('login',{deviceWidth})
+// });
 
- app.get("/login", (req, res) => {
-   const { email, password } = req.body;
-   if (email == "adminCoder@coder.com" && password == "adminCod3r123") {
-     req.session.email = email;
-     req.session.password = password;
-     req.session.rol = 'admin';
-     return res.send("login");
-   } else {
-      if((email) && (password)) {
-        req.session.email = email;
-        req.session.password = password;
-        req.session.rol = 'user';
-        return res.send("login");
+ 
+ //Endpoint session
+  // app.get("/session", (req, res) => {
+  //   if (req.session.counter) {
+  //     req.session.counter++;
+  //     res.send(`has entrado ${req.session.counter} de veces`);
+  //   } else {
+  //     req.session.counter = 1;
+  //     res.send("hola");
+  //   }
+  // });
+
+//  app.get("/login", (req, res) => {
+//    const { email, password } = req.body;
+//    if (email == "adminCoder@coder.com" && password == "adminCod3r123") {
+//      req.session.email = email;
+//      req.session.password = password;
+//      req.session.rol = 'admin';
+//      return res.send("login");
+//    } else {
+//       if((email) && (password)) {
+//         req.session.email = email;
+//         req.session.password = password;
+//         req.session.rol = 'user';
+//         return res.send("login");
    
-      } else {
-        return res.send("login fallido");
-      }   
-   }
- });
+//       } else {
+//         return res.send("login fallido");
+//       }   
+//    }
+//  });
 
- app.get("/logout", (req, res) => {
-   req.session.destroy((error) => {
-     res.send("salio");
-   });
- });
+//  app.get("/logout", (req, res) => {
+//    req.session.destroy((error) => {
+//      res.send("salio");
+//    });
+//  });
 
 //  app.get("/admin", auth, (req, res) => {
 //   req.session.rol = 'admin';
@@ -175,17 +198,45 @@ app.get("/realTimeProducts", (req, res) => {
   });
 });
 
-const io = new Server(server);
+//login del ususario
+  // app.get('/ingreso', requireLogin, (req, res) => {
+  //    res.render('product', { user: req.session.user });
+  // });
+ app.get('/api', requireLogin, (req, res) => {
+    res.redirect("/api/session/product", 200, {
+      message: "Bienvenido/a a mi tienda",
+    });
+  //res.render('product', { user: req.session.user });
+ });
 
-routerSocket.get("/", (req, res) => {
-  //  const deviceWidth="50%"
-  //    res.render("chat", {deviceWidth});
-  // res.render('home',{
-  //     tituloAlta:"Alta de Producto",
-  //     tituloEliminacion:"Eliminar Producto",
-  //     mensaje:"mundo"
-  // })
-});
+  app.get('/api/users/login', (req, res) => {
+    console.log('entra al login')
+    res.render('login', { user: req.session.user });
+  });
+  app.get("/api/users/loginregister", (req, res) => {
+    const deviceWidth="50%"
+    const context={actionURL:'/api/users'}
+    res.render("register", {deviceWidth,context});
+  });
+
+  app.get("/product", (req, res) => {
+    const deviceWidth="50%"
+    const user=req.session.user
+    res.render("product", {deviceWidth,user});
+  });
+
+
+const io = new Server(server);
+// routerSocket.get("/login", (req, res) => {
+//   const deviceWidth="50%"
+//   res.render("login", {deviceWidth});
+  
+//   // res.render('home',{
+//   //     tituloAlta:"Alta de Producto",
+//   //     tituloEliminacion:"Eliminar Producto",
+//   //     mensaje:"mundo"
+//   // })
+// });
 
 io.on("connection", (socket) => {
   socket.on("message", (info) => {

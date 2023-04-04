@@ -11,6 +11,10 @@ import ManagerCartMongoDB from "./MongoDB/models/Cart.js";
 import ManagerCartPostgresqlDB from "./Postgresql/models/Cart.js";
 import ManagerCartFileSystemDB from "./FileSystem/models/Cart.js";
 
+//import ManagerUserMongoDB from "./MongoDB/models/User.js";
+//import ManagerUserPostgresqlDB from "./Postgresql/models/User.js";
+//import ManagerUserFileSystemDB from "./FileSystem/models/User.js";
+
 export const getManagerMessages = () => {
   let modelMessage = "";
   switch (process.env.SELECTEDBDD) {
@@ -57,4 +61,24 @@ export const getManagerCarts = () => {
       break;
   }
   return modelCart;
+};
+
+export const getManagerUsers = async () => {
+  switch (process.env.SELECTEDBDD) {
+    case "1":
+      const modelUser =  await import("./MongoDB/models/User.js");
+      return modelUser;
+
+      break;
+    case "2":
+      modelUser =  await import("./PostgreSql/models/User.js");
+      return modelUser;
+
+      break;
+    case "3":
+      modelUser =  await import("./FileSystem/models/User.js");
+      return modelUser;
+
+      break;
+  }
 };

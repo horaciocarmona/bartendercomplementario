@@ -32,8 +32,9 @@ export class ManagerMongoDB {
   }
 
   async getElementById(id) {
-    this.setConnection();
     console.log("consulta de un elemento de MongoDb");
+
+    this.setConnection();
 
     try {
       const elemento = await this.model.findById(
@@ -60,7 +61,7 @@ export class ManagerMongoDB {
   async updateElement(id, info) {
     this.setConnection();
     try {
-      console.log(id,info)
+//      console.log(id,info)
       const mensaje = await this.model.findByIdAndUpdate(
         new mongoose.Types.ObjectId(id),
         info
