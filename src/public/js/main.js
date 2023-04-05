@@ -67,9 +67,15 @@ const deviceWidth="50%"
 
 // })  
    
-deslogeo.addEventListener('click',(e)=>{
+// deslogeo.addEventListener('click',(e)=>{
+//     console.log('event')
+//     res.redirect("/api/user/login");
+
+// })  
+
+registro.addEventListener('click',(e)=>{
     console.log('event')
-    res.redirect("/api/user/login");
+    res.redirect("/api/users/loginregister");
 
 })  
 
