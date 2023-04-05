@@ -73,11 +73,11 @@ const deviceWidth="50%"
 
 // })  
 
-registro.addEventListener('click',(e)=>{
-    console.log('event')
-    res.redirect("/api/users/loginregister");
+// registro.addEventListener('click',(e)=>{
+//     console.log('event')
+//     res.redirect("/api/users/loginregister");
 
-})  
+// })  
 
 socket.on('evento-admin',datos=>{console.log(datos)
 })
