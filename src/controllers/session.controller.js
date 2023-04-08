@@ -1,4 +1,5 @@
-
+import  {getUserByEmail}  from "./user.controller.js";
+import { validatePassword } from "../utils/bcrypt.js";
 export const getSession = (req, res, next) => {
   if (req.session.login) {
     //Si la sesion esta activa en la BDD
@@ -18,11 +19,13 @@ export const getSession = (req, res, next) => {
 };
 
 export const testLogin = async (req, res,next) => {
+  const { email, password } = req.body;
+  const user=await getUserByEmail(email)
   try {
-    console.log("login");
-    console.log("email", req.body);
-    const { email, password } = req.body;
-    if (email == "adminCoder@coder.com" && password == "adminCod3r123") {
+    // if (email == "adminCoder@coder.com" && password == "adminCod3r123") {
+//    if (email == "adminCoder@coder.com" && password == "adminCod3r123") {
+    if (email == user.email && password == validatePassword(user.password)) {
+
       req.session.user=req.body
       req.session.login = true;
       res.redirect("/api/session/product");

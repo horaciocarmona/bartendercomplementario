@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { getManagerCarts } from "../dao/daoManager.js";
 //import { getManagerProducts } from "../dao/daoManager.js"
-const cartManager = getManagerCarts();
+const cartManager = await getManagerCarts();
 const routerCart = Router();
 
 //EndPoint crea carrito con products vacio ruta\api\carts

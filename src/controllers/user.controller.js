@@ -1,6 +1,5 @@
 import  {getManagerUsers}  from "../dao/daoManager.js";
-//import { createHash } from "../utils/bcrypt.js";
-
+import { createHash } from "../utils/bcrypt.js";
 const data = await getManagerUsers()
 const managerUser = new data.ManagerUserMongoDB
 export  const createUser = async (req, res) => {
@@ -16,10 +15,10 @@ export  const createUser = async (req, res) => {
                 req.session.user=user    
                 res.redirect("/api/session/login")
             } else {
-                const rol='user'
-                await managerUser.addElements([{ first_name, last_name, email, age, password,rol}])
+                const passwordHash=createHash(password)
+                const userCreated=await managerUser.addElements([{ first_name:first_name, last_name:last_name, email:email, age:age, password:passwordHash}])
                 req.session.login=true                
-                req.session.user={ first_name, last_name, email, age, password,rol}    
+                req.session.user=userCreated    
                 res.redirect("/api/session/login")
             }
         } else {
@@ -57,22 +56,6 @@ export const getUserById = async (req, res) => {
     }
 }
 
-export const getUserByEmail = async (email) => {
-    try {
-        console.log('logeo getuserbyemail',email,managerUser)
-        const user = await managerUser.getElementByEmail(email)
-        if (user) {
-            return user
-        }
-        return res.status(200).send({
-            message: "Usuario no encontrado"
-        })
-    } catch (error) {
-        res.status(500).send({
-            message: error.message
-        })
-    }
-}
 
 export const register = async (req, res, next) => {
     console.log('register',req.session.user)
@@ -98,5 +81,18 @@ export const register = async (req, res, next) => {
         return res.status(200).send({
             message: "debe registarse"
         })
+    }
+}
+
+export const getUserByEmail = async (email) => {
+    try {
+        console.log('logeo getuserbyemail',email,managerUser)
+        const user = await managerUser.getElementByEmail(email)
+        if (user) {
+            return user
+        }
+        return  "Usuario no encontrado"
+    } catch (error) {
+            return error
     }
 }

@@ -1,6 +1,6 @@
 import local from 'passport-local'
 import passport from 'passport'
-import { managerUser } from '../controllers/user.controller.js'
+//import { managerUser } from '../controllers/user.controller.js'
 import { createHash, validatePassword } from '../utils/bcrypt.js'
 
 //Passport se va a trabajar como u nmiddleware

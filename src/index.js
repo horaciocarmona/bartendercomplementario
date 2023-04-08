@@ -10,10 +10,12 @@ import multer from "multer";
 import { engine } from "express-handlebars"; //server simple
 import * as path from "path";
 import { Server } from "socket.io";
-import { Router } from "express";
-import routerProd from "../src/routes/products.router.js";
-import routerCart from "../src/routes/carts.router.js";
-import routerUser from "../src/routes/user.router.js";
+//import { Router } from "express";
+import router from "./routes/routes.js";
+
+// import routerProd from "../src/routes/products.router.js";
+// import routerCart from "../src/routes/carts.router.js";
+// import routerUser from "../src/routes/user.router.js";
 import routerSocket from "../src/routes/socket.router.js";
 //import {ManagerMessageMongoDB} from '../src/dao/MongoDB/models/Message.js'
 // no se hace porque debo consultar a dao
@@ -76,10 +78,12 @@ app.set("port", process.env.PORT || 5000);
 //Routers
 app.use("/", express.static(__dirname + "/public"));
 app.use("/", routerSocket);
-app.use("/api/products", routerProd);
-app.use("/api/carts", routerCart);
-app.use("/api/session",routerSession)
-app.use("/api/users",routerUser)
+app.use("/", router);
+
+// app.use("/api/products", routerProd);
+// app.use("/api/carts", routerCart);
+// app.use("/api/session",routerSession)
+// app.use("/api/users",routerUser)
 
 // //Carga de Productos
 //  const start = async ()=>{
