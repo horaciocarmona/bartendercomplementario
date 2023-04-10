@@ -76,10 +76,12 @@ app.set("port", process.env.PORT || 5000);
 //Routers
 app.use("/", express.static(__dirname + "/public"));
 app.use("/", routerSocket);
-app.use("/api/products", routerProd);
-app.use("/api/carts", routerCart);
-app.use("/api/session",routerSession)
-app.use("/api/users",routerUser)
+//app.use('/',router)
+
+ app.use("/api/products", routerProd);
+ app.use("/api/carts", routerCart);
+ app.use("/api/session",routerSession)
+ app.use("/api/users",routerUser)
 
 // //Carga de Productos
 //  const start = async ()=>{

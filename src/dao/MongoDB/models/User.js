@@ -25,7 +25,7 @@ const userSchema = new Schema({
     },
     rol: {
         type: String,
-        requered: true
+        default: "User"
     }
 
 })
@@ -33,7 +33,6 @@ const userSchema = new Schema({
 export class ManagerUserMongoDB extends ManagerMongoDB {
     constructor() {
         super(process.env.MONGODBURL, "users", userSchema)
-
     }
 
     async getElementByEmail(email) {

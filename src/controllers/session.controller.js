@@ -1,4 +1,5 @@
-
+import  {getUserByEmail}  from "./user.controller.js";
+import { validatePassword } from "../utils/bcrypt.js";
 export const getSession = (req, res, next) => {
   if (req.session.login) {
     //Si la sesion esta activa en la BDD
@@ -17,13 +18,18 @@ export const getSession = (req, res, next) => {
   }
 };
 
-export const testLogin = async (req, res,next) => {
+export const testLogin=async (req, res,next)=> {
+  const { email, password } = req.body;
+  const user = await getUserByEmail(email)
+  console.log('fn',user)
+
   try {
-    console.log("login");
-    console.log("email", req.body);
-    const { email, password } = req.body;
-    if (email == "adminCoder@coder.com" && password == "adminCod3r123") {
-      req.session.user=req.body
+    console.log("login",user.email);
+    console.log("email",email );
+    console.log("password",password );
+
+    if (email == user.email && validatePassword(password,user.password)) {
+      req.session.user=user
       req.session.login = true;
       res.redirect("/api/session/product");
     } else {
@@ -54,4 +60,18 @@ export const product = (req, res, next) => {
   });
 };
 
+  // const getUserByEmail = async (email) => {
+        
+  //   try {
+  //       const managerUser=await getManagerUsers()
+  //       console.log('manageruser')
+  //       const user = await managerUser.getElementByEmail(email)
+  //       if (user) {
+  //           return user
+  //       }
+  //       return 'usuario no encontrado' 
+  //    } catch (error) {
+  //       return error
+  //   }
+  // }
 
