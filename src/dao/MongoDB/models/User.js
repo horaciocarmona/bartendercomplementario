@@ -32,15 +32,20 @@ const userSchema = new Schema({
 
 export class ManagerUserMongoDB extends ManagerMongoDB {
     constructor() {
-        super(process.env.MONGODBURL, "users", userSchema)
+        super("mongodb+srv://horaciocarmona:h21163ho@cluster0.z8ctovc.mongodb.net/ecommerce?retryWrites=true&w=majority", "users", userSchema)
     }
 
     async getElementByEmail(email) {
         super.setConnection()
         try {
+            // return await this.model.findOne({ email: email })
             return await this.model.findOne({ email: email })
+            // if (!user){
+            //     throw new Error('el ususario no exite')
+            // }
         } catch (error) {
             return error
+            
         }
     }
 

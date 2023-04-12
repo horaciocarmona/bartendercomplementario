@@ -1,23 +1,13 @@
-import  {getManagerUsers}  from "../dao/daoManager.js";
+import  {ManagerUserMongoDB}  from "../dao/MongoDB/models/User.js";
 import { createHash } from "../utils/bcrypt.js";
-const data=await getManagerUsers()
-const managerUser = data.ManagerUserMongoDB
-//  const managerUser = await getManagerUsers()
+export const managerUser =  await new ManagerUserMongoDB()
 
 export  const createUser = async (req, res) => {
-   console.log('createuser')
-//    const data=await getManagerUsers()
-//    const managerUser = data.ManagerUserMongoDB
-    //  const data=await getManagerUsers()
-    //  const managerUser = new data.ManagerUserMongoDB
-   
    try {
-        console.log('createuser',managerUser)
+        console.log('createuser')
         const { first_name, last_name, email, age, password } = req.body
-   
         if (email) {
-            console.log('getmanagerusers',managerUser)
-
+            console.log('getmanagerusers',await managerUser.getElementByEmail())
             const user = await managerUser.getElementByEmail(email)
             console.log('getelementbyemail',user,email)
             if (user) {
@@ -80,10 +70,6 @@ export const getUserById = async (req, res) => {
 export const getUserByEmail = async (email) => {
         
     try {
-//        console.log('logeo getuserbyemail',email,managerUser)
-//        console.log('getmanageruser',getManagerUsers())
-        // const data=await getManagerUsers()
-        // const managerUser = new data.ManagerUserMongoDB
         console.log('manageruser')
         const user = await managerUser.getElementByEmail(email)
         if (user) {
@@ -97,9 +83,7 @@ export const getUserByEmail = async (email) => {
 
 export const register = async (req, res, next) => {
     console.log('register')
-//    const data=await getManagerUsers()
-//    const managerUser = new data.ManagerUserMongoDB
- 
+
     const { first_name, last_name, email, age, password } = req.body;
     console.log('email',email)
     if (email) {

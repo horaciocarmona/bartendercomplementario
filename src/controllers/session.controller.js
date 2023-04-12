@@ -18,10 +18,10 @@ export const getSession = (req, res, next) => {
   }
 };
 
-export const testLogin=async (req, res,next)=> {
+export const testLogin= async (req, res,next)=> {
   const { email, password } = req.body;
   const user = await getUserByEmail(email)
-  console.log('fn',user)
+  console.log('fn',getUserByEmail())
 
   try {
     console.log("login",user.email);

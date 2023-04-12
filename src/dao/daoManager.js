@@ -63,22 +63,22 @@ export const getManagerCarts = () => {
   return modelCart;
 };
 
-export const getManagerUsers = async () => {
-  switch (process.env.SELECTEDBDD) {
-    case "1":
-      const modelUser =  await import("./MongoDB/models/User.js");
-      return modelUser;
+// export const getManagerUsers = async () => {
+//   switch (process.env.SELECTEDBDD) {
+//     case "1":
+//       const modelUser =  await import("./MongoDB/models/User.js");
+//       return modelUser;
 
-      break;
-    case "2":
-      modelUser =  await import("./PostgreSql/models/User.js");
-      return modelUser;
+//       break;
+//     case "2":
+//       modelUser =  await import("./PostgreSql/models/User.js");
+//       return modelUser;
 
-      break;
-    case "3":
-      modelUser =  await import("./FileSystem/models/User.js");
-      return modelUser;
+//       break;
+//     case "3":
+//       modelUser =  await import("./FileSystem/models/User.js");
+//       return modelUser;
 
-      break;
-  }
-};
+//       break;
+//   }
+// };
