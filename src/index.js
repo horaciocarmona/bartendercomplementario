@@ -57,7 +57,7 @@ app.use(urlencoded({ extended: true }));
    })
  );
 
- //passport
+ //passport se define antes de las rutas para usarlo como midlewords
 initializePassport()
 app.use(passport.initialize())
 app.use(passport.session())
@@ -230,11 +230,11 @@ app.get("/realTimeProducts", (req, res) => {
   });
   app.get("/api/users/loginregister", (req, res) => {
     const deviceWidth="50%"
-    const context={actionURL:'/api/users'}
+    const context={actionURL:'/api/users/register'}
     res.render("register", {deviceWidth,context});
   });
 
-  app.get("/product", (req, res) => {
+  app.get("/api/session/product", (req, res) => {
     const deviceWidth="50%"
     const user=req.session.user
     res.render("product", {deviceWidth,user});

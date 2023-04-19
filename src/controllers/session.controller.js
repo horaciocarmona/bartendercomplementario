@@ -1,5 +1,4 @@
 import  {getUserByEmail}  from "./user.controller.js";
-import { validatePassword } from "../utils/bcrypt.js";
 export const getSession = (req, res, next) => {
   if (req.session.login) {
     //Si la sesion esta activa en la BDD
@@ -11,36 +10,32 @@ export const getSession = (req, res, next) => {
     // });
   } else {
     //     //No esta activa la sesion
-         res.redirect("/api", 500, {
-//          res.redirect("/api/session/testLogin", 500, {
-
-   });
+         res.redirect("/api/session/login");
   }
 };
 
 export const testLogin= async (req, res,next)=> {
   const { email, password } = req.body;
   const user = await getUserByEmail(email)
-  console.log('fn',getUserByEmail())
-
+  console.log('entra al testlogin',user)
   try {
-    console.log("login",user.email);
-    console.log("email",email );
-    console.log("password",password );
-
-    if (email == user.email && validatePassword(password,user.password)) {
-      req.session.user=user
-      req.session.login = true;
-      res.redirect("/api/session/product");
-    } else {
-      console.log("registrese");
-      res.redirect("/api/users/loginregister", 200, {
-        message: "registrese para iniciar session",
-      });
+    if (!req.user) {
+      return res.status(400).send({status:'error', error:'Invalidate user'})
+    } 
+    //genero la sesion del usuario
+    req.session.user={
+        first_name:req.user.first_name,
+        last_name:req.user.last_name,
+        email:req.user.email,
+        age:req.user.age
     }
+//    res.status(200).send({status:'success', payload:req.user})
+    console.log('req.user',req.user)
+    res.redirect("/api/session/product");
+    
   } catch (error) {
     res.status(500).send({
-      message: error.message,
+      status:'error', error:error.message
     });
   }
 };
@@ -48,7 +43,7 @@ export const testLogin= async (req, res,next)=> {
 export const destroySession = (req, res, next) => {
   if (req.session.login) {
       req.session.destroy(() => {
-      res.redirect("/api");
+//      res.redirect("/api/session/login");
     });
   }
 };
