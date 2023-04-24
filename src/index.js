@@ -38,7 +38,7 @@ const app = express();
 //const fileStorage=fileStore(session)
 
 //Midlewares
-app.use(cookieParser(process.env.SIGNED_COOKIE));
+app.use(cookieParser(process.env.PRIVATE_KEY_JWT));
 app.use(express.json());
 app.use(urlencoded({ extended: true }));
  app.use(
@@ -215,13 +215,13 @@ app.get("/realTimeProducts", (req, res) => {
   //    res.render('product', { user: req.session.user });
   // });
  app.get('/api', requireLogin, (req, res) => {
-    // res.redirect("/api/session/product", 200, {
-    //   message: "Bienvenido/a a mi tienda",
-    // });
-    res.render('product',{
-    message: "Bienvenido/a a mi tienda",
-    user:req.session.user
+    res.redirect("/api/session/product", 200, {
+       message: "Bienvenido/a a mi tienda",
     });
+    // res.render('product',{
+    // message: "Bienvenido/a a mi tienda",
+    // user:req.session.user
+    // });
  });
 
   app.get('/api/users/login', (req, res) => {

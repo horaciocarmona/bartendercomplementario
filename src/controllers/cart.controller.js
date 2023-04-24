@@ -1,7 +1,9 @@
-import { getManagerCart } from "../dao/daoManager.js";
+//import { getManagerCart } from "../dao/daoManager.js";
+import  {ManagerCartMongoDB}  from "../dao/MongoDB/models/cart.js";
+export const managerCart =  new ManagerCartMongoDB()
 
-const data = await getManagerCart()
-const managerCart = new data.ManagerCartMongoDB
+// const data = await getManagerCart()
+// const managerCart = new data.ManagerCartMongoDB
 
 export const createCarrito = async (req, res) => {
     try {
@@ -16,6 +18,7 @@ export const createCarrito = async (req, res) => {
         })
     }
 }
+
 export const getProductsCart = async (req, res) => {
 
     try {

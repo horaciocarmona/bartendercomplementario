@@ -15,7 +15,6 @@ export const getProducts = async (req, res) => {
         if (productos) {
             return res.status(200).json(productos)
         }
-
         res.status(200).json({
             message: "Productos no encontrados"
         })

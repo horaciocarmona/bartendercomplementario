@@ -3,12 +3,15 @@ import mongoose from "mongoose";
 const { Schema } = mongoose;
 import { ManagerMongoDB } from "../../../db/mongoDBManager.js";
 const cartSchema = new Schema({
+
   products: {
     type: [
       {
-        idProd: {
-          type: mongoose.Types.ObjectId,
+        id_Prod: {
+          type: Schema.Types.ObjectId,
           ref: "products",
+          required:true
+
         },
         cant: Number,
       },
@@ -16,7 +19,7 @@ const cartSchema = new Schema({
   },
 });
 
-export default class ManagerCartMongoDB extends ManagerMongoDB {
+export class ManagerCartMongoDB extends ManagerMongoDB {
   constructor() {
     super(process.env.MONGODBURL, "carts", cartSchema);
     //atributos propios
@@ -29,7 +32,7 @@ export default class ManagerCartMongoDB extends ManagerMongoDB {
       let prodId = new mongoose.Types.ObjectId(idProd);
       let carrito = await this.model.findById(cartId);
       const product = carrito.products.find((product) =>
-        new mongoose.Types.ObjectId(idProd).equals(product.idProd)
+        new mongoose.Types.ObjectId(idProd).equals(product.id_Prod)
       );
       const nuevoProducts = carrito.products;
       if (product) {
@@ -54,7 +57,7 @@ export default class ManagerCartMongoDB extends ManagerMongoDB {
     try {
       const respuesta = await this.model
         .find()
-        .populate({ path: "products.idProd" });
+        .populate({ path: "products.id_Prod" });
       return respuesta;
     } catch (error) {
       console.log("error en getProductsCart", error);
@@ -69,7 +72,7 @@ export default class ManagerCartMongoDB extends ManagerMongoDB {
 
       let carrito = await this.model.findById(cartId);
       const resto = carrito.products.filter(
-        (product) => !new mongoose.Types.ObjectId(idProd).equals(product.idProd)
+        (product) => !new mongoose.Types.ObjectId(idProd).equals(product.id_Prod)
       );
       console.log(resto);
       carrito.products = resto;
@@ -89,8 +92,8 @@ export default class ManagerCartMongoDB extends ManagerMongoDB {
       if (carrito) {
         const resto = carrito.products.filter(
           (product) =>
-            !new mongoose.Types.ObjectId(product.idProd).equals(
-              new mongoose.Types.ObjectId(product.idProd)
+            !new mongoose.Types.ObjectId(product.id_Prod).equals(
+              new mongoose.Types.ObjectId(product.id_Prod)
             )
         );
         console.log(resto);

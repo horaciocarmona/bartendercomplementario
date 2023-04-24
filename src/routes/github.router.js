@@ -12,6 +12,7 @@ routerGithub.get('/githubSession',passport.authenticate('github'),
 async(req,res)=>{
     console.log('/githubSession',req.user)
     req.session.user=req.user
+    req.session.login=true
     res.redirect('/api/session/product')
 })
 

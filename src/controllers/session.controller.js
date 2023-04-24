@@ -3,7 +3,9 @@ export const getSession = (req, res, next) => {
   if (req.session.login) {
     //Si la sesion esta activa en la BDD
           res.redirect("/api/session/product", 200, {
-     });
+//            res.redirect("/api", 200, {
+
+    });
 
     // res.redirect("/api/session/product", 200, {
     //   message: "Bienvenido/a a mi tienda",
@@ -20,6 +22,7 @@ export const testLogin= async (req, res,next)=> {
   console.log('entra al testlogin',user)
   try {
     if (!req.user) {
+      req.session.login=false
       return res.status(400).send({status:'error', error:'Invalidate user'})
     } 
     //genero la sesion del usuario
@@ -29,9 +32,11 @@ export const testLogin= async (req, res,next)=> {
         email:req.user.email,
         age:req.user.age
     }
+    req.session.login=true
 //    res.status(200).send({status:'success', payload:req.user})
     console.log('req.user',req.user)
     res.redirect("/api/session/product");
+//    res.redirect("/api");
     
   } catch (error) {
     res.status(500).send({
@@ -43,7 +48,7 @@ export const testLogin= async (req, res,next)=> {
 export const destroySession = (req, res, next) => {
   if (req.session.login) {
       req.session.destroy(() => {
-//      res.redirect("/api/session/login");
+      res.redirect("/api");
     });
   }
 };

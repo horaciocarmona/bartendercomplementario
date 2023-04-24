@@ -1,6 +1,5 @@
 import  {ManagerUserMongoDB}  from "../dao/MongoDB/models/User.js";
-import { createHash } from "../utils/bcrypt.js";
-export const managerUser =  await new ManagerUserMongoDB()
+export const managerUser =  new ManagerUserMongoDB()
 
 export  const createUser = (req, res) => {
     res.send({status:'success', message:'User created'})

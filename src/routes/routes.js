@@ -15,5 +15,7 @@ router.use("/api/carts", routerCart);
 router.use("/api/session",routerSession)
 router.use("/api/users",routerUser)
 router.use("/session",routerGithub)
-
+// router.use("*",(req,res)=>{
+//     res.status(404).send({error:"404 ruta equivocada"})
+// })
 export default router

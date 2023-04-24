@@ -1,5 +1,5 @@
 import { ManagerMongoDB } from "../../../db/mongoDBManager.js";
-import { Schema } from "mongoose";
+import { Schema} from "mongoose";
 
 const userSchema = new Schema({
     first_name: {
@@ -26,7 +26,12 @@ const userSchema = new Schema({
     rol: {
         type: String,
         default: "User"
-    }
+    },
+    id_Cart: {
+        type: Schema.Types.ObjectId,
+        ref: "carts"
+    },
+
 
 })
 
@@ -34,7 +39,6 @@ export class ManagerUserMongoDB extends ManagerMongoDB {
     constructor() {
         super("mongodb+srv://horaciocarmona:h21163ho@cluster0.z8ctovc.mongodb.net/ecommerce?retryWrites=true&w=majority", "users", userSchema)
     }
-
     async getElementByEmail(email) {
         super.setConnection()
         try {
@@ -45,7 +49,6 @@ export class ManagerUserMongoDB extends ManagerMongoDB {
             // }
         } catch (error) {
             return error
-            
         }
     }
 

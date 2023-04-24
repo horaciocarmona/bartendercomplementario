@@ -7,9 +7,9 @@ import ManagerProductMongoDB from "./MongoDB/models/Product.js";
 import ManagerProductPostgresqlDB from "./Postgresql/models/Product.js";
 import ManagerProductFileSystemDB from "./FileSystem/models/Product.js";
 
-import ManagerCartMongoDB from "./MongoDB/models/Cart.js";
-import ManagerCartPostgresqlDB from "./Postgresql/models/Cart.js";
-import ManagerCartFileSystemDB from "./FileSystem/models/Cart.js";
+// import ManagerCartMongoDB from "./MongoDB/models/Cart.js";
+// import ManagerCartPostgresqlDB from "./Postgresql/models/Cart.js";
+// import ManagerCartFileSystemDB from "./FileSystem/models/Cart.js";
 
 //import ManagerUserMongoDB from "./MongoDB/models/User.js";
 //import ManagerUserPostgresqlDB from "./Postgresql/models/User.js";
@@ -47,21 +47,21 @@ export const getManagerProducts = () => {
   return modelProduct;
 };
 
-export const getManagerCarts = () => {
-  let modelCart = "";
-  switch (process.env.SELECTEDBDD) {
-    case "1":
-      modelCart = new ManagerCartMongoDB();
-      break;
-    case "2":
-      modelCart = new ManagerCartPostgresqlDB();
-      break;
-    case "3":
-      modelCart = new ManagerCartFileSystemDB();
-      break;
-  }
-  return modelCart;
-};
+// export const getManagerCarts = () => {
+//   let modelCart = "";
+//   switch (process.env.SELECTEDBDD) {
+//     case "1":
+//       modelCart = new ManagerCartMongoDB();
+//       break;
+//     case "2":
+//       modelCart = new ManagerCartPostgresqlDB();
+//       break;
+//     case "3":
+//       modelCart = new ManagerCartFileSystemDB();
+//       break;
+//   }
+//   return modelCart;
+// };
 
 // export const getManagerUsers = async () => {
 //   switch (process.env.SELECTEDBDD) {
