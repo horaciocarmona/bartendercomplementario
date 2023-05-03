@@ -1,6 +1,10 @@
 import  {getUserByEmail}  from "./user.controller.js";
+import { generateToken } from "../utils/jwt.js";
+import passport from "passport"
+
 export const getSession = (req, res, next) => {
-  if (req.session.login) {
+//  if (req.session.login) {
+    if (req.user) {
     //Si la sesion esta activa en la BDD
           res.redirect("/api/session/product", 200, {
 //            res.redirect("/api", 200, {
@@ -24,7 +28,7 @@ export const testLogin= async (req, res,next)=> {
     if (!req.user) {
       req.session.login=false
       return res.status(400).send({status:'error', error:'Invalidate user'})
-    } 
+    }
     //genero la sesion del usuario
     req.session.user={
         first_name:req.user.first_name,
@@ -36,14 +40,38 @@ export const testLogin= async (req, res,next)=> {
 //    res.status(200).send({status:'success', payload:req.user})
     console.log('req.user',req.user)
     res.redirect("/api/session/product");
-//    res.redirect("/api");
-    
+
   } catch (error) {
-    res.status(500).send({
+    return res.status(500).send({
       status:'error', error:error.message
     });
   }
 };
+
+
+export const testLoginJWT= async (req, res, next) => {
+  //    const { email,password } = req.body
+      passport.authenticate('login', { session: false }, async (err, user, info) => {
+        if (err) {
+          return next(err);
+        }
+        if (!user) {
+          return res.status(401).json({ message: err });
+        }
+        try {
+          const accessToken=generateToken(user)
+          console.log(accessToken)
+          res.cookie('jwtCookie', accessToken, { httpOnly: true });
+          res.redirect('/api/session/product')
+          // res.json({ message: 'Inicio de sesión exitoso' });
+        } catch (err) {
+          next(err);
+        }
+      })(req, res, next);
+}
+  
+
+
 
 export const destroySession = (req, res, next) => {
   if (req.session.login) {
@@ -56,12 +84,12 @@ export const destroySession = (req, res, next) => {
 export const product = (req, res, next) => {
   res.render("product", {
     message: "Bienvenido/a a mi tienda",
-    user:req.session.user
+    user:req.user.user
   });
 };
 
   // const getUserByEmail = async (email) => {
-        
+
   //   try {
   //       const managerUser=await getManagerUsers()
   //       console.log('manageruser')
@@ -69,7 +97,7 @@ export const product = (req, res, next) => {
   //       if (user) {
   //           return user
   //       }
-  //       return 'usuario no encontrado' 
+  //       return 'usuario no encontrado'
   //    } catch (error) {
   //       return error
   //   }

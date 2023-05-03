@@ -1,5 +1,5 @@
 import cookieParser from "cookie-parser";
-//import  fileStore  from "session-file-store";
+import fileStore from "session-file-store";
 import routerSession from "../src/routes/session.router.js";
 import MongoStore from "connect-mongo";
 import passport from "passport";
@@ -15,13 +15,14 @@ import { Router } from "express";
 // import routerProd from "../src/routes/products.router.js";
 // import routerCart from "../src/routes/carts.router.js";
 // import routerUser from "../src/routes/user.router.js";
-import router from "../src/routes/routes.js"
+import router from "../src/routes/routes.js";
 
 import routerSocket from "../src/routes/socket.router.js";
 //import {ManagerMessageMongoDB} from '../src/dao/MongoDB/models/Message.js'
 // no se hace porque debo consultar a dao
 import { getManagerMessages } from "../src/dao/daoManager.js";
 import initializePassport from "./config/passport.js";
+import { passportError, authorization } from "./utils/messageErrors.js";
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -35,48 +36,58 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 const managerMessage = getManagerMessages();
 const app = express();
-//const fileStorage=fileStore(session)
+const fileStorage = fileStore(session);
 
 //Midlewares
 app.use(cookieParser(process.env.PRIVATE_KEY_JWT));
 app.use(express.json());
 app.use(urlencoded({ extended: true }));
- app.use(
-   session({
-//   lugar de guardado time to live intentos de lectura      
-//     store : new fileStorage({path:'./sessions',ttl:30000,retries:1}),
-    store: MongoStore.create({
-        mongoUrl:process.env.MONGODBURL,
-        mongoOptions:{useNewUrlParser:true,useUnifiedTopology:true},
-        ttl:30,
-    }),
-     secret: process.env.SESSION_SECRET,
-     resave: true,
-     saveUninitialized: true,
+app.use(
+  session({
+    //   lugar de guardado time to live intentos de lectura
+    //  store : new fileStorage({path:'./sessions',ttl:30000,retries:1}),
+    //  store: MongoStore.create({
+    //      mongoUrl:process.env.MONGODBURL,
+    //      mongoOptions:{useNewUrlParser:true,useUnifiedTopology:true},
+    //      ttl:30,
+    //  }),
+    secret: process.env.SESSION_SECRET,
+    resave: true,
+    saveUninitialized: true,
+  })
+);
 
-   })
- );
-
- //passport se define antes de las rutas para usarlo como midlewords
-initializePassport()
-app.use(passport.initialize())
-app.use(passport.session())
+//passport se define antes de las rutas para usarlo como midlewords
+initializePassport();
+app.use(passport.initialize());
+//app.use(passport.session())
 
 function requireLogin(req, res, next) {
-  console.log('requirelogin',req.session.user)
+  console.log("requirelogin", req.session.user);
   if (!req.session.user) {
-    console.log('redirectlogin',req.session.user)
-    return res.redirect('/api/users/login');
-    }
-    next();
+    console.log("redirectlogin", req.session.user);
+    return res.redirect("/api/users/login");
   }
+  next();
+}
 
- function auth(req, res, next) {
-   if (req.session?.email === "admin@admin.com") {
-     return next();
-   }
-   return res.send("no tenes acceso a esta ruta");
- }
+function requireLoginJWT(req, res, next) {
+  console.log("requireloginJWT");
+  if (req.user) {
+    return res.redirect("/api/session/product");
+  } else {
+    console.log("redirectloginJWT");
+    return res.redirect("/api/users/loginJWT");
+  }
+  next();
+}
+
+function auth(req, res, next) {
+  if (req.session?.email === "admin@admin.com") {
+    return next();
+  }
+  return res.send("no tenes acceso a esta ruta");
+}
 
 app.engine("handlebars", engine()); //configuracion de hbs
 app.set("view engine", "handlebars");
@@ -86,7 +97,7 @@ app.set("port", process.env.PORT || 5000);
 //Routers
 app.use("/", express.static(__dirname + "/public"));
 app.use("/", routerSocket);
-app.use('/',router)
+app.use("/", router);
 
 //  app.use("/api/products", routerProd);
 //  app.use("/api/carts", routerCart);
@@ -137,41 +148,40 @@ app.post("/upload", upload.single("product"), (req, res) => {
   res.send("Imagen cargada");
 });
 
-
 // const source = document.getElementById('formulario-template').innerHTML;
 // const template = Handlebars.compile(source);
 // const html = template(context);
 // document.getElementById('formulario-container').innerHTML = html;
 
 //Endpoint cookies
- app.get("/setCookie", (req, res) => {
-   res.cookie("CookieCookie", "esto es una cookie", {
-       maxAge: 20000,
-       signed: true,
-     })
-     .send("Cookie");
- });
+app.get("/setCookie", (req, res) => {
+  res
+    .cookie("CookieCookie", "esto es una cookie", {
+      maxAge: 20000,
+      signed: true,
+    })
+    .send("Cookie");
+});
 
- app.get("/getCookie", (req, res) => {
-   res.send(req.signedCookies);
- });
+app.get("/getCookie", (req, res) => {
+  res.send(req.signedCookies);
+});
 
 // app.get("/session", (req, res) => {
 //     const deviceWidth="50%"
 //     res.render('login',{deviceWidth})
 // });
 
- 
- //Endpoint session
-  // app.get("/session", (req, res) => {
-  //   if (req.session.counter) {
-  //     req.session.counter++;
-  //     res.send(`has entrado ${req.session.counter} de veces`);
-  //   } else {
-  //     req.session.counter = 1;
-  //     res.send("hola");
-  //   }
-  // });
+//Endpoint session
+// app.get("/session", (req, res) => {
+//   if (req.session.counter) {
+//     req.session.counter++;
+//     res.send(`has entrado ${req.session.counter} de veces`);
+//   } else {
+//     req.session.counter = 1;
+//     res.send("hola");
+//   }
+// });
 
 //  app.get("/login", (req, res) => {
 //    const { email, password } = req.body;
@@ -186,10 +196,10 @@ app.post("/upload", upload.single("product"), (req, res) => {
 //         req.session.password = password;
 //         req.session.rol = 'user';
 //         return res.send("login");
-   
+
 //       } else {
 //         return res.send("login fallido");
-//       }   
+//       }
 //    }
 //  });
 
@@ -211,41 +221,58 @@ app.get("/realTimeProducts", (req, res) => {
 });
 
 //login del ususario
-  // app.get('/ingreso', requireLogin, (req, res) => {
-  //    res.render('product', { user: req.session.user });
+// app.get('/ingreso', requireLogin, (req, res) => {
+//    res.render('product', { user: req.session.user });
+// });
+app.get("/api", requireLoginJWT, (req, res) => {
+  res.redirect("/api/session/product", 200, {
+    message: "Bienvenido/a a mi tienda",
+  });
+  // res.render('product',{
+  // message: "Bienvenido/a a mi tienda",
+  // user:req.session.user
   // });
- app.get('/api', requireLogin, (req, res) => {
-    res.redirect("/api/session/product", 200, {
-       message: "Bienvenido/a a mi tienda",
-    });
-    // res.render('product',{
-    // message: "Bienvenido/a a mi tienda",
-    // user:req.session.user
-    // });
- });
+});
 
-  app.get('/api/users/login', (req, res) => {
-    console.log('entra al login')
-    res.render('login', { user: req.session.user });
-  });
-  app.get("/api/users/loginregister", (req, res) => {
-    const deviceWidth="50%"
-    const context={actionURL:'/api/users/register'}
-    res.render("register", {deviceWidth,context});
-  });
+app.get("/api/users/login", (req, res) => {
+  console.log("entra al login");
+  const contextRegister = { actionURLRegister: "/api/users/register" };
+  const context = { actionURL: "/api/session/login" };
+  res.render("login", { user: req.session.user });
+});
 
-  app.get("/api/session/product", (req, res) => {
-    const deviceWidth="50%"
-    const user=req.session.user
-    res.render("product", {deviceWidth,user});
-  });
+app.get("/api/users/loginJWT", (req, res) => {
+  console.log("entra al loginJWT");
+  const context = { actionURL: "/api/session/loginJWT" };
+  const contextRegister = { actionURLRegister: "/api/users/registerJWT" };
+  //    res.render('login', { user: req.user });
+  res.render("login", { user: req.user });
+});
 
+app.get("/api/users/loginregister", (req, res) => {
+  const deviceWidth = "50%";
+  const context = { actionURL: "/api/users/register" };
+  res.render("register", { deviceWidth, context });
+});
+
+app.get("/api/users/loginregisterJWT", (req, res) => {
+  console.log("entra al loginregisterJWT");
+  const deviceWidth = "50%";
+  const context = { actionURL: "/api/users/registerJWT" };
+  res.render("register", { deviceWidth, context });
+});
+
+app.get("/api/session/product", (req, res) => {
+  const deviceWidth = "50%";
+  const user = req.session.user;
+  res.render("product", { deviceWidth, user });
+});
 
 const io = new Server(server);
 // routerSocket.get("/login", (req, res) => {
 //   const deviceWidth="50%"
 //   res.render("login", {deviceWidth});
-  
+
 //   // res.render('home',{
 //   //     tituloAlta:"Alta de Producto",
 //   //     tituloEliminacion:"Eliminar Producto",
