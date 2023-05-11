@@ -1,0 +1,13 @@
+.product-container{
+    background-color: rgb(255, 219, 196);
+    display: flex;
+    flex-direction: column;
+    margin: 20px;
+    margin-left: 40vw;
+    padding: 20px;
+    width: 400px;
+    height: 500px;
+    justify-content: center;  
+    align-items: center  ;
+    p {margin:0px};
+}

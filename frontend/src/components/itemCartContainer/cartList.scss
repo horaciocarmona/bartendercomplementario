@@ -1,0 +1,16 @@
+.principalContainer{
+    background-color: rgb(255, 219, 196);
+    display: flex;
+    flex-direction: column;
+    margin: 20px;
+    padding: 10px;
+    width: 70vw;
+    height: 80vh;
+    justify-content: center;  
+    align-items: center  ;
+    margin-left: 13vw;
+    p {margin:0px};
+    .botonCierre{
+        a Button {margin:15px}
+    }
+}
