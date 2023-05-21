@@ -1,43 +1,44 @@
-//import { getManagerCart } from "../dao/daoManager.js";
-import  {ManagerCartMongoDB}  from "../dao/MongoDB/models/cart.js";
-export const managerCart =  new ManagerCartMongoDB()
+import {
+    addProductsCart,
+    deleteAllProductsCartById,
+    deleteProductCartById,
+    addCarts,
+    updateProductCartById,
+    findProductsCart,
+    insertProductCart,
+} from "../services/CartServices.js";
 
 // const data = await getManagerCart()
 // const managerCart = new data.ManagerCartMongoDB
 
-export const createCarrito = async (req, res) => {
+export const createCart = async (req, res) => {
     try {
-        const respuesta = await managerCart.addElements()
-
-        return res.status(200).json(respuesta)
-
-
+        const respuesta = await addCarts([{}]);
+        return res.status(200).json(respuesta);
     } catch (error) {
-        res.status(500).json({
-            message: error.message
-        })
+        return res.status(500).json({
+            message: error.message,
+        });
     }
-}
+};
 
 export const getProductsCart = async (req, res) => {
-
     try {
-        const productos = await managerCart.getProductsCart()
+        const productos = await findProductsCart();
 
         if (productos) {
-            return res.status(200).json(productos)
+            return res.status(200).json(productos);
         }
 
-        res.status(200).json({
-            message: "Productos no encontrados"
-        })
-
+        return res.status(200).json({
+            message: "Productos no encontrados",
+        });
     } catch (error) {
-        res.status(500).json({
-            message: error.message
-        })
+        return res.status(500).json({
+            message: error.message,
+        });
     }
-}
+};
 /*
 export const getProduct = async (req, res) => {
     const { id } = req.params
@@ -57,61 +58,145 @@ export const getProduct = async (req, res) => {
 }
 */
 export const addProductCart = async (req, res) => {
-    const { id } = req.params
-    const { id_prod, cant } = req.body
+    const {
+        cant = "0"
+    } = req.body;
 
     try {
-        const product = await managerCart.addProductCart(id, id_prod, cant)
-        res.status(204).json(product)
+        const product = await insertProductCart(
+            req.params.cid,
+            req.params.pid,
+            cant
+        );
+        if (product instanceof Error) {
+            return res.status(200).json({
+                message: "No se pudo agregar",
+            });
+        } else {
+            if (product) {
+                return res.status(200).json({
+                    message: "Producto agregado al carrito",
+                });
+            }
+        }
+        return res.status(204).json(product);
     } catch (error) {
-        res.status(500).json({
-            message: error.message
-        })
+        return res.status(500).json({
+            message: error
+        });
     }
-}
+};
 
 export const updateProductCart = async (req, res) => {
-    const { id } = req.params
-    const { title, description, code, price, status, stock, category, thumbnails } = req.body
+    const id = req.params.cid;
+    const {
+        title,
+        description,
+        code,
+        price,
+        status,
+        stock,
+        category,
+        thumbnails,
+    } = req.body;
     try {
-        const product = await managerCart.updateElement(id, { title: title, description: description, code: code, price: price, status: status, stock: stock, category: category, thumbnails: thumbnails })
-
-        if (product) {
+        const product = await updateProductCartById(id, {
+            title: title,
+            description: description,
+            code: code,
+            price: price,
+            status: status,
+            stock: stock,
+            category: category,
+            thumbnails: thumbnails,
+        });
+        if (product instanceof Error) {
             return res.status(200).json({
-                message: "Producto actualizado"
-            })
+                message: "No se pudo actualizar",
+            });
+        } else {
+            if (product) {
+                return res.status(200).json({
+                    message: "Producto actualizado",
+                });
+            }
         }
 
-        res.status(200).json({
-            message: "Producto no encontrado"
-        })
-
+        return res.status(200).json({
+            message: product,
+        });
     } catch (error) {
-        res.status(500).json({
-            message: error.message
-        })
+        return res.status(500).json({
+            message: error.message,
+        });
     }
-
-}
+};
 
 export const deleteProductCart = async (req, res) => {
-    const { id } = req.params
     try {
-        const product = await managerCart.deleteElement(id)
-
-        if (product) {
+        const product = await deleteProductCartById(req.params.cid, req.params.pid);
+        if (product instanceof Error) {
             return res.status(200).json({
-                message: "Producto eliminado"
-            })
+                message: "No se pudo eliminar",
+            });
+        } else {
+            if (product) {
+                return res.status(200).json({
+                    message: "Producto eliminado",
+                });
+            }
         }
-
-        res.status(200).json({
-            message: "Producto no encontrado"
-        })
+        return res.status(200).json({
+            message: product,
+        });
     } catch (error) {
-        res.status(500).json({
-            message: error.message
-        })
+        return res.status(500).json({
+            message: error,
+        });
     }
+};
 
-}
+export const deleteAllProductsCart = async (req,res) => {
+    try {
+        const id = req.params.cid;
+        const product = await deleteAllProductsCartById(id);
+        if (product instanceof Error) {
+            return res.status(200).json({
+                message: "No se pudo borrar todos los productos",
+            });
+        } else {
+            if (product) {
+                return res.status(200).json({
+                    message: "Se borraron todos los productos",
+                });
+            }
+        }
+        return res.status(200).json({
+            message: product,
+        });
+    } catch (error) {
+        return res.status(500).json({
+            message: error,
+        });
+    }
+};
+
+export const updateProductsCart = async (req, res) => {
+    if (req.params.cid) {
+        const product = await addProductsCart(req.params.cid, req.body);
+        if (product instanceof Error) {
+            return res.status(200).json({
+                message: "No se pudo actualizar los productos en el carrito",
+            });
+        } else {
+            if (product) {
+                return res.status(200).json({
+                    message: "Se actualizaron los productos en el carrito",
+                });
+            }
+        }
+        return res.status(200).json({
+            message: product,
+        });
+    }
+};

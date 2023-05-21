@@ -1,10 +1,12 @@
+import "dotenv/config";
+import nodemailer from 'nodemailer'
 import cookieParser from "cookie-parser";
-import mongoose from 'mongoose'
+import connectionMongoose from "./db/mongoose.js";
+import sequelize from "./db/sequelize.js";
 import fileStore from "session-file-store";
 import routerSession from "../src/routes/session.router.js";
 import MongoStore from "connect-mongo";
 import passport from "passport";
-import "dotenv/config";
 import express, { urlencoded } from "express";
 import session from "express-session";
 import { __dirname } from "./path.js";
@@ -53,15 +55,16 @@ const app = express();
 const fileStorage = fileStore(session);
 
 //conexion mongoose
-const connectionMongoose = async () => {
-  await mongoose.connect(process.env.MONGODBURL, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-  })
-      .catch((err) => console.log(err));
-}
+// const connectionMongoose = async () => {
+//   await mongoose.connect(process.env.MONGODBURL, {
+//       useNewUrlParser: true,
+//       useUnifiedTopology: true,
+//   })
+//       .catch((err) => console.log(err));
+// }
 
-connectionMongoose()
+await sequelize.sync().then(connect=>console.log('sequelize conectado'))
+await connectionMongoose().then(connect=>console.log('mongoose conectado'))
 
 
 //Midlewares
@@ -163,6 +166,29 @@ app.use("/auth", routerSession);
 //    ])
 //  }
 //  start()
+// use de mail con nodemail
+const transport=nodemailer.createTransport({
+    service:'gmail',
+    port: 587,
+    auth:{
+      user:'horacio.carmona@gmail.com',
+      pass:process.env.PASSWORDGMAIL
+    }
+})
+app.get('/mail',async (req,res)=>{
+  const resultado=await transport.sendMail({
+    from:'horacio.carmona@gmail.com',
+    to:'carmona_horacio@hotmail.com',
+    subject:'suscripcion a ecommerce',
+    html:` <div>
+                <h1>hola se suscribio a ecommerce</h1>
+           </div>
+    `,
+    attachments:[]
+
+  })    
+  res.send('mail enviado')
+})
 
 // Uso de Servidor io
 const server = app.listen(app.get("port"), () =>

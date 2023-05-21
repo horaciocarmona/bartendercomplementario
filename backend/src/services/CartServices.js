@@ -1,4 +1,4 @@
-import cartModel from "../models/CartModel.js";
+import cartModel from "../models/MongoDB/CartModel.js";
 import mongoose from "mongoose";
 
 
@@ -14,18 +14,7 @@ import mongoose from "mongoose";
     }
   }
 
-  export const deleteCartById=async (id)=> {
-    try {
-      const mensaje = await cartModel.findByIdAndRemove(
-        new mongoose.Types.ObjectId(id)
-      );
-      return mensaje;
-    } catch (error) {
-      return error;
-    }
-  }
-
-  export const updateCartById=async(id, info)=> {
+  export const updateProductCartById=async(id, info)=> {
     try {
 //      console.log(id,info)
       const mensaje = await cartModel.findByIdAndUpdate(
@@ -47,7 +36,98 @@ import mongoose from "mongoose";
     }
   }
 
- export const addProductCart=async(id, idProd, cant)=> {
+ export const insertProductCart=async(id, idProd, cant)=> {
+    try {
+      console.log('insert productcart',id,idProd)
+      let cartId = new mongoose.Types.ObjectId(id);
+      let prodId = new mongoose.Types.ObjectId(idProd);
+      let carrito = await cartModel.findById(cartId);
+      console.log('carrito',carrito)
+      const product = carrito.products.find((product) =>
+        new mongoose.Types.ObjectId(idProd).equals(product.id_Prod)
+      );
+
+      const nuevoProducts = carrito.products;
+      console.log('nuevo producto',carrito.products)
+      if (product) {
+        product.cant = cant;
+        console.log(cant);
+      } else {
+        const nuevoProducts = carrito.products.push({
+          prodId: prodId,
+          cant: cant,
+        });
+      }
+      carrito.products = nuevoProducts;
+      const respuesta = await cartModel.findByIdAndUpdate(cartId, carrito);
+      return respuesta;
+    } catch (error) {
+      return error;
+    }
+  }
+
+  export const findProductsCart=async()=> {
+    try {
+      const respuesta = await cartModel
+        .find()
+        .populate({ path: "products.id_Prod" });
+      return respuesta;
+    } catch (error) {
+      return error;
+    }
+  }
+
+  export const deleteProductCartById=async(id, idProd)=> {
+    try {
+      let cartId = new mongoose.Types.ObjectId(id);
+      let prodId = new mongoose.Types.ObjectId(idProd);
+
+      let carrito = await cartModel.findById(cartId);
+      const resto = carrito.products.filter(
+        (product) => !new mongoose.Types.ObjectId(idProd).equals(product.id_Prod)
+      );
+      console.log(resto);
+      carrito.products = resto;
+      const respuesta = await cartModel.findByIdAndUpdate(id, carrito);
+      return respuesta;
+    } catch (error) {
+      return error;
+    }
+  }
+
+  export const deleteAllProductsCartById=async(id)=> {
+    try {
+      let cartId = new mongoose.Types.ObjectId(id);
+      let carrito = await cartModel.findById(id);
+      let mensaje = "";
+      if (carrito) {
+        // const resto = carrito.products.filter(
+        //   (product) =>
+        //     !new mongoose.Types.ObjectId(product.id_Prod).equals(
+        //       new mongoose.Types.ObjectId(product.id_Prod)
+        //     )
+        // );
+        // console.log(resto);
+        carrito.products = [];
+        const respuesta = await cartModel.findByIdAndUpdate(id, carrito);
+
+        //            carrito.products.forEach(async element => {
+        //            mensaje= await this.deleteProductsCart(cartId,element.idProd)
+
+        //            });
+//        console.log(cartModel.find());
+         return respuesta     
+} else {
+        
+          return `no existe el carrito con id: ${req.params.cid} en la base de datos`
+        ;
+      }
+    } catch (error) {
+      return error;
+    }
+  }
+
+  export const addProductsCart=async(id, idProd, cant)=> {
     try {
       let cartId = new mongoose.Types.ObjectId(id);
       let prodId = new mongoose.Types.ObjectId(idProd);
@@ -69,68 +149,6 @@ import mongoose from "mongoose";
       const respuesta = await cartModel.findByIdAndUpdate(cartId, carrito);
       return respuesta;
     } catch (error) {
-      console.log("error en adproductcart", error);
+      return error;
     }
   }
-
-  export const getProductsCart=async()=> {
-    try {
-      const respuesta = await cartModel
-        .find()
-        .populate({ path: "products.id_Prod" });
-      return respuesta;
-    } catch (error) {
-      console.log("error en getProductsCart", error);
-    }
-  }
-
-  const deleteProductsCart=async(id, idProd)=> {
-    try {
-      let cartId = new mongoose.Types.ObjectId(id);
-      let prodId = new mongoose.Types.ObjectId(idProd);
-
-      let carrito = await cartModel.findById(cartId);
-      const resto = carrito.products.filter(
-        (product) => !new mongoose.Types.ObjectId(idProd).equals(product.id_Prod)
-      );
-      console.log(resto);
-      carrito.products = resto;
-      const respuesta = await cartModel.findByIdAndUpdate(id, carrito);
-      return respuesta;
-    } catch (error) {
-      console.log("error en getProductsCart", error);
-    }
-  }
-
-  const deleteAllProductsCart=async(id)=> {
-    try {
-      let cartId = new mongoose.Types.ObjectId(id);
-      let carrito = await cartModel.findById(id);
-      let mensaje = "";
-      if (carrito) {
-        const resto = carrito.products.filter(
-          (product) =>
-            !new mongoose.Types.ObjectId(product.id_Prod).equals(
-              new mongoose.Types.ObjectId(product.id_Prod)
-            )
-        );
-        console.log(resto);
-        carrito.products = resto;
-        const respuesta = await cartModel.findByIdAndUpdate(id, carrito);
-
-        //            carrito.products.forEach(async element => {
-        //            mensaje= await this.deleteProductsCart(cartId,element.idProd)
-
-        //            });
-        console.log(cartModel.find());
-      } else {
-        console.log(
-          `no existe el carrito con id: ${req.params.cid} en la base de datos`
-        );
-      }
-      return mensaje;
-    } catch (error) {
-      console.log("error en getProductsCart", error);
-    }
-  }
-

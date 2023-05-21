@@ -1,24 +1,42 @@
-import { findProducts,findProductById,addProducts,updateProductById,deleteProductById } from "../services/ProductServices.js";
+import { InstanceError } from "sequelize";
+import { findProducts,findProductById,insertProducts,updateProductById,deleteProductById } from "../services/ProductServices.js";
 
-
-export const getProducts = async (req, res) => {
-    const { limit, page, filter, sort } = req.query;
-
-    const pag = page != undefined ? page : 1
-    const limi = limit != undefined ? limit : 10
-    const ord = sort == "asc" ? 1 : -1
+export const getProducts = async (req,res) => {
+    console.log(`consulta con limit page category name sort}`);
+    const {
+      page = "1",
+      limit = "10",
+      sort = "0",
+      category = "",
+      title = "",
+    } = req.query;
+  //  const resultado=await getProducts()
+    //  const resultado = await getProducts(
+    //  parseInt(limit),
+    //  parseInt(page),
+    //   title,
+    //   category,
+    //   parseInt(ord)
+    //  );
+    let ord="0" 
+    ord = !sort ? "0" : sort === "asc" ? "1" : "-1";
+    // const pag = page != undefined ? page : 1
+    // const limi = limit != undefined ? limit : 10
+    // //    const ord = sort == "asc" ? 1 : -1
     try {
-        const productos = await findProducts(limi, pag, filter, ord)
-
+        const productos = await findProducts(parseInt(limit), parseInt(page),title,category, parseInt(ord))
+        console.log(productos)
         if (productos) {
-            return res.status(200).json(productos)
+            return res.status(200).send(productos)
+
+//            return res.status(200).json(productos)
         }
-        res.status(200).json({
+        res.status(200).send({
             message: "Productos no encontrados"
         })
 
     } catch (error) {
-        res.status(500).json({
+        res.status(500).send({
             message: error.message
         })
     }
@@ -33,24 +51,26 @@ export const getProduct = async (req, res) => {
             return res.status(200).json(product)
         }
 
-        res.status(200).json({
+        return res.status(200).json({
             message: "Producto no encontrado"
         })
     } catch (error) {
-        res.status(500).json({
+        return res.status(500).json({
             message: error.message
         })
     }
 }
 
-export const createProduct = async (req, res) => {
+export const addProducts = async (req, res) => {
     const { title, description, code, price, status, stock, category } = req.body
 
     try {
-        const product = await addProducts([{ title, description, code, price, status, stock, category }])
-        res.status(204).json(product)
+        const product = await insertProducts([{ title, description, code, price, status, stock, category }])
+        console.log("producto dado de alta")
+        return res.status(204).json({message: "Producto dado de alta"})
+
     } catch (error) {
-        res.status(500).json({
+        return res.status(500).json({
             message: error.message
         })
     }
@@ -62,18 +82,25 @@ export const updateProduct = async (req, res) => {
     try {
         const product = await updateProductById(id, { title: title, description: description, code: code, price: price, status: status, stock: stock, category: category, thumbnails: thumbnails })
 
-        if (product) {
+        if (product instanceof Error){
             return res.status(200).json({
-                message: "Producto actualizado"
+                message: "Producto no encontrado"
             })
-        }
 
-        res.status(200).json({
+        } else {
+            if (product) {
+                return res.status(200).json({
+                        message: "Producto actualizado"
+                })
+            }
+        } 
+
+        return res.status(200).json({
             message: "Producto no encontrado"
         })
 
     } catch (error) {
-        res.status(500).json({
+        return res.status(500).json({
             message: error.message
         })
     }
@@ -81,23 +108,30 @@ export const updateProduct = async (req, res) => {
 }
 
 export const deleteProduct = async (req, res) => {
-    const { id } = req.params
     try {
-        const product = await deleteProductById(id)
-
-        if (product) {
+        console.log('delete product',req.params.id)
+        const product = await deleteProductById(req.params.id)
+        console.log(product instanceof Error)    
+        if (product instanceof Error){
             return res.status(200).json({
-                message: "Producto eliminado"
+                message: "Producto no encontrado"
             })
-        }
 
-        res.status(200).json({
+        } else {
+            if (product) {
+                return res.status(200).json({
+                        message: "Producto eliminado"
+                })
+            }
+        } 
+        return res.status(200).json({
             message: "Producto no encontrado"
         })
     } catch (error) {
-        res.status(500).json({
+        return res.status(500).json({
             message: error.message
         })
     }
 
+    
 }
