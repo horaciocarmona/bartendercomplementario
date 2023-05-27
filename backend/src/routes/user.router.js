@@ -1,9 +1,10 @@
 import { Router } from 'express'
 import { getUsers } from "../controllers/user.controller.js";
+import { passportError, authorization } from "../utils/messageErrors.js";
 
 const routerUsers = Router()
 
-routerUsers.get('/', getUsers)
+routerUsers.get('/', passportError('current'),authorization('Admin'),getUsers)
 
 export default routerUsers
 

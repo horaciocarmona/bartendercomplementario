@@ -1,3 +1,4 @@
+
 import {
     addProductsCart,
     deleteAllProductsCartById,
@@ -6,6 +7,7 @@ import {
     updateProductCartById,
     findProductsCart,
     insertProductCart,
+    purchaseTicket
 } from "../services/CartServices.js";
 
 // const data = await getManagerCart()
@@ -25,11 +27,10 @@ export const createCart = async (req, res) => {
 export const getProductsCart = async (req, res) => {
     try {
         const productos = await findProductsCart();
-
         if (productos) {
+            console.log('productos',productos)
             return res.status(200).json(productos);
         }
-
         return res.status(200).json({
             message: "Productos no encontrados",
         });
@@ -181,6 +182,7 @@ export const deleteAllProductsCart = async (req,res) => {
     }
 };
 
+
 export const updateProductsCart = async (req, res) => {
     if (req.params.cid) {
         const product = await addProductsCart(req.params.cid, req.body);
@@ -200,3 +202,24 @@ export const updateProductsCart = async (req, res) => {
         });
     }
 };
+
+export const purchaseCart = async (req, res) => {
+    try {
+        if (req.params.cid) {
+            console.log(req.params.cid)
+            const ticket = await purchaseTicket(req.params.cid,req.user);
+            if (ticket) {
+                return res.status(200).json({message: "Ticket de Compra"});
+            } else {
+                return res.status(200).json({
+                    message: "Se cancelo la Compra",
+                });
+            }
+        }
+    } catch (error) {
+        return res.status(500).json({
+            message: error,
+        });
+    }
+};
+

@@ -1,8 +1,10 @@
 import passport from 'passport'
-import { strategyJWT } from '../config/Strategies/strategy.js'
+import { strategyJWT,current } from '../config/Strategies/strategy.js'
 
 const initializePassport = () => {
-    passport.use(strategyJWT)
+    console.log('current')
+    passport.use("current",current)
+//    passport.use(strategyJWT)
 }
 
 export default initializePassport

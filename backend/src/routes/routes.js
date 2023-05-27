@@ -4,12 +4,11 @@ import routerCart from "./carts.router.js";
 import routerSession from "./session.router.js";
 import routerUser from "./user.router.js";
 import routerGithub from "./github.router.js";
-
-//import routerSocket from './socket.router';
+import routerSocket from './socket.router.js';
 const router=Router()
 
 //router.use("/", express.static(__dirname + "/public"));
-//router.use("/", routerSocket);
+router.use("/", routerSocket);
 router.use("/api/products", routerProd);
 router.use("/api/carts", routerCart);
 router.use("/api/session",routerSession)

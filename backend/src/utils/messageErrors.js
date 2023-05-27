@@ -1,10 +1,21 @@
 import passport from "passport";
+import { Strategy as JwtStrategy, ExtractJwt } from 'passport-jwt';
+
+
 
 //Funcion general para retornar errores en las estrategias de Passport
 export const passportError = (strategy) => {
     return async (req, res, next) => {
-        passport.authenticate(strategy, (error, user, info) => {
-            console.log('áutenticate',user,error)
+        const authorizationHeader = req.cookies.jwt;
+        console.log('autorization',authorizationHeader)
+        if (authorizationHeader) {
+          const token = authorizationHeader.replace('Bearer ', '');
+          req.headers['authorization'] = `Bearer ${token}`;
+        }
+      
+       
+        passport.authenticate(strategy,{session:false}, (error, user, info) => {
+            console.log('áutenticate',user)
             if (error) {
                 return next(error)
             }
@@ -15,9 +26,9 @@ export const passportError = (strategy) => {
                 // })
             }
 
-            req.user = user
-            next()
-        })(req, res, next)
+            req.user = user;
+            next();
+        })(req, res, next);
 
     }
 }
@@ -30,7 +41,7 @@ export const authorization = (rol) => {
             })
         }
         console.log('req.user',req.user) //Acceso a las propiedades del user en JWT
-        if (req.user.user.rol != rol) {
+        if (req.user.rol != rol) {
             return res.status(403).send({
                 error: "User no tiene los permisos necesarios"
             })

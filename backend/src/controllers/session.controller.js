@@ -64,7 +64,7 @@ export const testLoginJWT= async (req, res, next) => {
         try {
           const accessToken=generateToken(user)
           console.log(accessToken)
-          res.cookie('jwtCookie', accessToken, { httpOnly: true });
+          res.cookie('jwt', accessToken, { httpOnly: true });
           res.redirect('/api/session/product')
           // res.json({ message: 'Inicio de sesión exitoso' });
         } catch (err) {
@@ -120,7 +120,8 @@ export const product = (req, res, next) => {
             const token = jwt.sign({ user: { id: newUser._id } }, process.env.PRIVATE_KEY_JWT, {
               expiresIn: "12h",
           });
-            res.cookie('jwt', token, { httpOnly: true });
+
+          res.cookie('jwt', token, { httpOnly: true });
             res.status(201).json({ token });
         }
 
@@ -133,7 +134,7 @@ export const product = (req, res, next) => {
 
 export const loginUser = async (req, res, next) => {
   try {
-      passport.authenticate('jwt', { session: false }, async (err, user, info) => {
+      passport.authenticate('current', { session: false }, async (err, user, info) => {
           if (err) {
               return res.status(401).send("Error en consulta de token")
           }
@@ -156,7 +157,7 @@ export const loginUser = async (req, res, next) => {
               // Ya que el usuario es valido, genero un nuevo token
               const token = jwt.sign({ user: { id: userBDD._id } }, process.env.PRIVATE_KEY_JWT, {
                 expiresIn: "12h",
-            })
+              })
               res.cookie('jwt', token, { httpOnly: true })
               return res.status(200).json({ token })
           } else {
@@ -169,6 +170,7 @@ export const loginUser = async (req, res, next) => {
                       return res.status(401).send("Credenciales no válidas")
                   } else {
                       // Token valido
+                      res.cookie('jwt', token, { httpOnly: true})
                       req.user = user
                       next()
                   }

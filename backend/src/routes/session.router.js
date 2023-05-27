@@ -13,10 +13,10 @@ const routerSession=Router()
 routerSession.post("/register",registerUser)
 routerSession.post('/login',loginUser)
 routerSession.get('/logout', destroySession)
-routerSession.get('/product',passport.authenticate('jwt',{session:false}), product)
+routerSession.get('/product',passport.authenticate('current',{session:false}), product)
 
 // consulta las cookies de mi navegador
-routerSession.get('/testJWT',passport.authenticate('jwt',{session:false},(req,res)=>{
+routerSession.get('/testJWT',passport.authenticate('current',{session:false},(req,res)=>{
     res.send(req)
 }))
 routerSession.get('/current',passportError('current'),authorization('User'),(req,res)=>{

@@ -38,6 +38,6 @@ const userSchema = new Schema({
 
 userSchema.plugin(paginate)
 
-const userModel = model("Users", userSchema)
+const userModel = model("users", userSchema)
 
 export default userModel
