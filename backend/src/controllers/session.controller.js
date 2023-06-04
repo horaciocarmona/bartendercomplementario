@@ -4,6 +4,10 @@ import passport from "passport"
 import { createUser, findUserByEmail } from "../services/UserServices.js";
 import jwt from "jsonwebtoken";
 import { validatePassword, createHash } from "../utils/bcrypt.js";
+import CustomError from "../helpers/middlewares/errors/CustomError.js";
+import EErrors from "../helpers/middlewares/errors/enums.js"
+import {generateUserErrorInfo} from "../helpers/middlewares/errors/info.js"
+import {generateLoginUserErrorInfo} from "../helpers/middlewares/errors/info.js"
 
 export const getSession = (req, res, next) => {
 //  if (req.session.login) {
@@ -91,24 +95,18 @@ export const product = (req, res, next) => {
   });
 };
 
-  // const getUserByEmail = async (email) => {
+  export const registerUser = async (req, res, next) => {
 
-  //   try {
-  //       const managerUser=await getManagerUsers()
-  //       console.log('manageruser')
-  //       const user = await managerUser.getElementByEmail(email)
-  //       if (user) {
-  //           return user
-  //       }
-  //       return 'usuario no encontrado'
-  //    } catch (error) {
-  //       return error
-  //   }
-  // }
-
-  export const registerUser = async (req, res) => {
+    const { first_name, last_name, email, age, password } = req.body
     try {
-        const { first_name, last_name, email, age, password } = req.body
+        if (!first_name || !last_name || !email || !age || !password) {
+            CustomError.createError({
+            name:"User created error",
+            cause: generateUserErrorInfo({ first_name, last_name, email, age, password }),
+            message:"Error trying to create user",
+            code:EErrors.INVALID_TYPES_ERROR
+          })
+        }
         const userBDD = await findUserByEmail(email)
         console.log('userbdd',userBDD)
         if (userBDD) {
@@ -126,15 +124,26 @@ export const product = (req, res, next) => {
         }
 
 
-    } catch (error) {
-        res.status(500).send(`Ocurrio un error en Registro User, ${error}`)
-    }
+      } catch (error) {
+            next(error)
+//                  res.status(500).send(`Ocurrio un error en Registro User, ${error}`)
+      }
    
 }
 
 export const loginUser = async (req, res, next) => {
   try {
-      passport.authenticate('current', { session: false }, async (err, user, info) => {
+    const { email, password } = req.body
+    if (!email || !password) {
+       CustomError.createError({
+       name:"User logged error",
+       cause: generateLoginUserErrorInfo({ email, password }),
+       message:"Error login user",
+       code:EErrors.INVALID_TYPES_ERROR
+       })
+     }
+
+    passport.authenticate('current', { session: false }, async (err, user, info) => {
           if (err) {
               return res.status(401).send("Error en consulta de token")
           }
@@ -179,6 +188,7 @@ export const loginUser = async (req, res, next) => {
 
       })(req, res, next)
   } catch (error) {
-      res.status(500).send(`Ocurrio un error en Session, ${error}`)
+        next(error)    
+    //      res.status(500).send(`Ocurrio un error en Session, ${error}`)
   }
 }

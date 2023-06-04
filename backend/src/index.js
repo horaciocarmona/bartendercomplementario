@@ -1,4 +1,6 @@
 import "dotenv/config";
+import { faker } from '@faker-js/faker';
+import compression from "express-compression"
 import nodemailer from 'nodemailer'
 import cookieParser from "cookie-parser";
 import connectionMongoose from "./db/mongoose.js";
@@ -19,7 +21,7 @@ import { Router } from "express";
 // import routerCart from "../src/routes/carts.router.js";
 // import routerUser from "../src/routes/user.router.js";
 import router from "../src/routes/routes.js";
-
+import errorHandler from "./helpers/middlewares/errors/index.js"
 import routerSocket from "../src/routes/socket.router.js";
 //import {ManagerMessageMongoDB} from '../src/dao/MongoDB/models/Message.js'
 // no se hace porque debo consultar a dao
@@ -68,6 +70,7 @@ await connectionMongoose().then(connect=>console.log('mongoose conectado'))
 
 
 //Midlewares
+app.use(compression({brotli:{enabled:true,zlib:{}}})) //para comprimir archivos 
 app.use(cors(corsOptions))
 app.use(cookieParser(process.env.PRIVATE_KEY_JWT));
 app.use(express.json());
@@ -87,10 +90,12 @@ app.use(
   })
 );
 
+
 //passport se define antes de las rutas para usarlo como midlewords
 initializePassport();
 app.use(passport.initialize());
 //app.use(passport.session())
+
 
 function requireLogin(req, res, next) {
   console.log("requirelogin", req.session.user);
@@ -128,7 +133,8 @@ app.set("port", process.env.PORT || 5000);
 app.use("/", express.static(__dirname + "/public"));
 app.use("/", routerSocket);
 app.use("/", router);
-app.use("/auth", routerSession);
+app.use(errorHandler)
+//app.use("/auth", routerSession);
 
 //  app.use("/api/products", routerProd);
 //  app.use("/api/carts", routerCart);
@@ -161,7 +167,7 @@ app.use("/auth", routerSession);
 //        {title:"Capel reservado clasico 700ml",description:"",price:4200,thumpbnail:"",code:4,stock:300,status:true,category:"mediano"},
 //        {title:"Negroni 750ml",description:"",price:5000,thumpbnail:"",code:5,stock:190,status:true,category:"grande"},
 //        {title:"Heraclito clasico 700ml",description:"",price: 4500,thumpbnail:"",code:6,stock:180,status:true,category:"mediano"},
-//        {title:"Whisky Jack Daniels 750ml",description:"",price:12000,thumpbnail:"",code:7,stock:178,status:true,category:"grande"},
+//        {title:"Whisky Jack Daniels 750ml",descripon:"",price:12000,thumpbnail:"",code:7,stock:178,status:true,category:"grande"},
 //        {title:"Puerto de Indias clasico 700ml",description:"",price:6300,thumpbnail:"",code:7,stock:165,status:true,category:"grande"}
 //    ])
 //  }
@@ -190,11 +196,34 @@ app.get('/mail',async (req,res)=>{
   res.send('mail enviado')
 })
 
+
 // Uso de Servidor io
 const server = app.listen(app.get("port"), () =>
   console.log(`
 server on port ${app.get("port")}`)
 );
+
+// mockup de datos de usuarios
+const users = []
+
+const createRandomUser = () => {
+    return {
+        userId: faker.datatype.uuid(),
+        username: faker.internet.userName(),
+        email: faker.internet.email(),
+        avatar: faker.image.avatar(),
+        img: faker.image.food(),
+        password: faker.internet.password(),
+        birthdate: faker.date.birthdate(),
+        registeredAt: faker.date.past(),
+    };
+}
+
+// for (let i = 0; i < 100; i++) {
+//     users.push(createRandomUser());
+// }
+
+// console.log(users)
 
 //Carga de Imagenes
 app.post("/upload", upload.single("product"), (req, res) => {
@@ -321,6 +350,16 @@ app.get("/api/session/product", (req, res) => {
   const user = req.session.user;
   res.render("product", { deviceWidth, user });
 });
+
+//middleware para bajar informacion comprimida
+app.get('/string',(req,res)=>{
+  let string="hola buenas noches argentina desde la quiaca"
+  for (let i=0 ;i < 1000;i++){
+    string+="hola buenas noches argentina desde la quiaca"
+  }
+  res.send(string)
+})
+
 
 const io = new Server(server);
 // routerSocket.get("/login", (req, res) => {

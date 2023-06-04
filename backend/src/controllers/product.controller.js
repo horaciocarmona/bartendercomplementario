@@ -1,5 +1,9 @@
 import { InstanceError } from "sequelize";
 import { findProducts,findProductById,insertProducts,updateProductById,deleteProductById } from "../services/ProductServices.js";
+import CustomError from "../helpers/middlewares/errors/CustomError.js";
+import EErrors from "../helpers/middlewares/errors/enums.js"
+import {generateProductErrorInfo} from "../helpers/middlewares/errors/info.js"
+import {generateProductAddErrorInfo} from "../helpers/middlewares/errors/info.js"
 
 export const getProducts = async (req,res) => {
     console.log(`consulta con limit page category name sort}`);
@@ -61,26 +65,54 @@ export const getProduct = async (req, res) => {
     }
 }
 
-export const addProducts = async (req, res) => {
+export const addProducts = async (req, res,next) => {
     const { title, description, code, price, status, stock, category } = req.body
 
     try {
-        const product = await insertProducts([{ title, description, code, price, status, stock, category }])
-        console.log("producto dado de alta")
-        return res.status(204).json({message: "Producto dado de alta"})
+        if (!title || !description || !code || !price || !status || !stock || !category )  {
+            CustomError.createError({
+            name:"Product add error",
+            cause: generateProductAddErrorInfo({ title, description, code, price, status, stock, category }),
+            message:"Error creation Product",
+            code:EErrors.INVALID_TYPES_ERROR
+          })
+        }
 
+        const product = await insertProducts([{ title, description, code, price, status, stock, category }])
+        if (product instanceof Error){
+            return res.status(200).json({
+                message: "Error en creacion de Producto"
+            })
+
+        } else {
+            if (product){
+                return res.status(200).json({
+                message: "Producto dado de alta"
+                })
+            }
+        }   
     } catch (error) {
-        return res.status(500).json({
-            message: error.message
-        })
+        next(error)
+        // return res.status(500).json({
+        //     message: error.message
+        // })
     }
 }
 
-export const updateProduct = async (req, res) => {
+export const updateProduct = async (req, res,next) => {
     const { id } = req.params
-    const { title, description, code, price, status, stock, category, thumbnails } = req.body
+    const { title, description, code, price, status, stock, category, thumpbnail } = req.body
     try {
-        const product = await updateProductById(id, { title: title, description: description, code: code, price: price, status: status, stock: stock, category: category, thumbnails: thumbnails })
+        if (!title || !description || !code || !price || !status || !stock || !category || !thumpbnail)  {
+            CustomError.createError({
+            name:"Product update error",
+            cause: generateProductErrorInfo({ title, description, code, price, status, stock, category, thumpbnail }),
+            message:"Error update Product",
+            code:EErrors.INVALID_TYPES_ERROR
+          })
+        }
+
+        const product = await updateProductById(id, { title: title, description: description, code: code, price: price, status: status, stock: stock, category: category, thumpbnail: thumpbnail })
 
         if (product instanceof Error){
             return res.status(200).json({
@@ -100,9 +132,10 @@ export const updateProduct = async (req, res) => {
         })
 
     } catch (error) {
-        return res.status(500).json({
-            message: error.message
-        })
+        next(error)
+        // return res.status(500).json({
+        //     message: error.message
+        // })
     }
 
 }

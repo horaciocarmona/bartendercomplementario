@@ -2,7 +2,6 @@ import { Router } from "express";
 import { updateProductsCart,createCart,deleteProductCart,getProductsCart,addProductCart,deleteAllProductsCart,purchaseCart} from "../controllers/cart.controller.js";
 import { passportError, authorization } from "../utils/messageErrors.js";
 
-
 //import { getManagerProducts } from "../dao/daoManager.js"
 const routerCart = Router();
 

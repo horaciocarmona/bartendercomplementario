@@ -1,5 +1,6 @@
 import {Router} from "express"
 import passport from "passport"
+
 //import { generateToken } from "../utils/jwt.js";
 //import { validatePassword } from '../utils/bcrypt.js'
 import { getSession,destroySession,testLogin,testLoginJWT,product,registerUser, loginUser} from "../controllers/session.controller.js"

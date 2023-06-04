@@ -1,3 +1,8 @@
+import CustomError from "../helpers/middlewares/errors/CustomError.js";
+import EErrors from "../helpers/middlewares/errors/enums.js";
+import {
+    generateProductErrorInfo
+} from "../helpers/middlewares/errors/info.js";
 
 import {
     addProductsCart,
@@ -7,7 +12,7 @@ import {
     updateProductCartById,
     findProductsCart,
     insertProductCart,
-    purchaseTicket
+    purchaseTicket,
 } from "../services/CartServices.js";
 
 // const data = await getManagerCart()
@@ -28,7 +33,7 @@ export const getProductsCart = async (req, res) => {
     try {
         const productos = await findProductsCart();
         if (productos) {
-            console.log('productos',productos)
+            console.log("productos", productos);
             return res.status(200).json(productos);
         }
         return res.status(200).json({
@@ -40,24 +45,7 @@ export const getProductsCart = async (req, res) => {
         });
     }
 };
-/*
-export const getProduct = async (req, res) => {
-    const { id } = req.params
-    try {
-        const product = await managerCart.getElementById(id);
-        if (product) {
-            return res.status(200).json(product)
-        }
-        res.status(200).json({
-            message: "Producto no encontrado"
-        })
-    } catch (error) {
-        res.status(500).json({
-            message: error.message
-        })
-    }
-}
-*/
+
 export const addProductCart = async (req, res) => {
     const {
         cant = "0"
@@ -83,12 +71,12 @@ export const addProductCart = async (req, res) => {
         return res.status(204).json(product);
     } catch (error) {
         return res.status(500).json({
-            message: error
+            message: error,
         });
     }
 };
 
-export const updateProductCart = async (req, res) => {
+export const updateProductCart = async (req, res, next) => {
     const id = req.params.cid;
     const {
         title,
@@ -98,9 +86,36 @@ export const updateProductCart = async (req, res) => {
         status,
         stock,
         category,
-        thumbnails,
+        thumpbnail,
     } = req.body;
     try {
+        if (
+            !title ||
+            !description ||
+            !code ||
+            !price ||
+            !status ||
+            !stock ||
+            !category ||
+            !thumpbnail
+        ) {
+            CustomError.createError({
+                name: "Product update cart error",
+                cause: generateProductErrorInfo({
+                    title,
+                    description,
+                    code,
+                    price,
+                    status,
+                    stock,
+                    category,
+                    thumpbnail,
+                }),
+                message: "Error update Product Cart",
+                code: EErrors.INVALID_TYPES_ERROR,
+            });
+        }
+
         const product = await updateProductCartById(id, {
             title: title,
             description: description,
@@ -109,7 +124,7 @@ export const updateProductCart = async (req, res) => {
             status: status,
             stock: stock,
             category: category,
-            thumbnails: thumbnails,
+            thumpbnail: thumpbnail,
         });
         if (product instanceof Error) {
             return res.status(200).json({
@@ -127,9 +142,10 @@ export const updateProductCart = async (req, res) => {
             message: product,
         });
     } catch (error) {
-        return res.status(500).json({
-            message: error.message,
-        });
+        next(error);
+        // return res.status(500).json({
+        //     message: error.message,
+        // });
     }
 };
 
@@ -157,7 +173,7 @@ export const deleteProductCart = async (req, res) => {
     }
 };
 
-export const deleteAllProductsCart = async (req,res) => {
+export const deleteAllProductsCart = async (req, res) => {
     try {
         const id = req.params.cid;
         const product = await deleteAllProductsCartById(id);
@@ -182,7 +198,6 @@ export const deleteAllProductsCart = async (req,res) => {
     }
 };
 
-
 export const updateProductsCart = async (req, res) => {
     if (req.params.cid) {
         const product = await addProductsCart(req.params.cid, req.body);
@@ -206,10 +221,12 @@ export const updateProductsCart = async (req, res) => {
 export const purchaseCart = async (req, res) => {
     try {
         if (req.params.cid) {
-            console.log(req.params.cid)
-            const ticket = await purchaseTicket(req.params.cid,req.user);
+            console.log(req.params.cid);
+            const ticket = await purchaseTicket(req.params.cid, req.user);
             if (ticket) {
-                return res.status(200).json({message: "Ticket de Compra"});
+                return res.status(200).json({
+                    message: "Ticket de Compra",
+                });
             } else {
                 return res.status(200).json({
                     message: "Se cancelo la Compra",
@@ -222,4 +239,3 @@ export const purchaseCart = async (req, res) => {
         });
     }
 };
-
