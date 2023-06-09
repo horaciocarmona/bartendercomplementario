@@ -1,0 +1,23 @@
+<h1>
+    login 
+</h1>
+<h2>
+   <p>{{message}}</p> 
+</h2>
+<div>
+    <form action='/api/session/login' method='post'>
+        <label for ='email'>Email:</label>
+        <input type="text" class="form-control" id="email" name="email" placeholder="" />
+        <label for ='clave'>Clave:</label>
+        <input type="text" class="form-control" id="password" name="password" placeholder="" />
+        <button type="submit" id="ingreso">enviar</button> 
+    </form>
+    <form action='/api/users/loginregister' method='get'>
+
+        <button type="submit" id="registro">registro</button> 
+    </form>
+    <form action='/session/githubSession' method='get'>
+        <button type="submit" id="Ingresar con Github">Ingresar con Github</button> 
+    </form>
+
+</div>

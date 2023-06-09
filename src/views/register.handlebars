@@ -1,0 +1,22 @@
+<h1>
+    registro usuario
+</h1>
+<h2>
+    <p>mensaje</p>
+   <p>{{message}}</p> 
+</h2>
+<div>
+    <form action='/api/users/register' method='post'>
+        <label for ='first_name'>Nombre:</label>
+        <input type="text" class="form-control" id="first_name" name="first_name" placeholder="" />
+        <label for ='last_name'>Apellido:</label>
+        <input type="text" class="form-control" id="last_name" name="last_name" placeholder="" />
+        <label for ='email'>Email:</label>
+        <input type="text" class="form-control" id="email" name="email" placeholder="" />
+        <label for ='age'>Edad:</label>
+        <input type="number" class="form-control" id="age" name="age" placeholder="" />
+        <label for ='password'>Clave:</label>
+        <input type="text" class="form-control" id="password" name="password" placeholder="" />
+        <button type="submit">enviar</button> 
+    </form>
+</div>
