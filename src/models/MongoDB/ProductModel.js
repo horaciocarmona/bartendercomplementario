@@ -1,6 +1,6 @@
 import { Schema,model } from 'mongoose'
 import paginate from "mongoose-paginate-v2"
-
+//
 const productSchema = new Schema({
     title:{type:String,require:true,max:50,index:true},
     description:{type:String,require:true,max:50,index:true},
