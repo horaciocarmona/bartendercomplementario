@@ -1,0 +1,10 @@
+warning: Alerta!
+error: No se puede logear el usuario por error: User logged error: Error login user
+error: No se puede logear el usuario por User logged error: Error login user
+error: Usuario de email pepe@aa.com no encontrado
+error: Usuario de email pepe@aa.com no encontrado
+error: No se puede logear el usuario por User logged error: Error login user
+error: No se puede logear el usuario por User logged error: Error login user
+error: Usuario de email 55444 no encontrado
+error: No se puede crear el usuario por falta de algun dato pedido (irst_name, last_name, email, age, password)
+error: No se puede crear el usuario por falta de algun dato pedido (irst_name, last_name, email, age, password)

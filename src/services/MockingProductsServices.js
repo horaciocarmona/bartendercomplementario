@@ -30,14 +30,7 @@ import { faker } from '@faker-js/faker';
             code:generarCodigoProducto(),
             stock:getRandomNumber(0,200),
             status:true,
-            category:obtenerCategoriaAleatoria()
-            // category:{type:String,
-            //     index:true,
-            //     require:true,
-            //     enum:['grande','mediano','chico'],
-            //     default:'mediano'}
-            // }
-        
+            category:obtenerCategoriaAleatoria(),
         };
     }
     export const findProducts=async ()=> {

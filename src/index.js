@@ -1,4 +1,6 @@
 import "dotenv/config";
+import { addLogger } from './utils/logger.js'
+
 import { faker } from '@faker-js/faker';
 import compression from "express-compression"
 import nodemailer from 'nodemailer'
@@ -75,9 +77,15 @@ switch (parseInt(process.env.SELECTEDBDD)) {
  
 }
   
+// uso de logger
+// app.get("/", (req, res) => {
+//     req.logger.warning("Alerta!")
+//     res.send("Hola")
+// })
   
 
 //Midlewares
+app.use(addLogger) //uso de logger
 app.use(compression({brotli:{enabled:true,zlib:{}}})) //para comprimir archivos 
 app.use(cors(corsOptions))
 app.use(cookieParser(process.env.PRIVATE_KEY_JWT));
@@ -180,6 +188,9 @@ app.use(errorHandler)
 //    ])
 //  }
 //  start()
+
+
+
 // use de mail con nodemail
 const transport=nodemailer.createTransport({
     service:'gmail',
