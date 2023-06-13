@@ -1,6 +1,6 @@
 import { faker } from '@faker-js/faker';
 
-    //    
+    ///    
     function obtenerCategoriaAleatoria() {
       const categorias = ['grande', 'mediano', 'chico'];
       const indiceAleatorio = Math.floor(Math.random() * categorias.length);
