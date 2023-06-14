@@ -1,5 +1,4 @@
 import winston from "winston";
-
 const customLevelOpt = {
     levels: {
         fatal: 0,
