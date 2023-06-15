@@ -4,7 +4,7 @@ import CustomError from "../helpers/middlewares/errors/CustomError.js";
 import EErrors from "../helpers/middlewares/errors/enums.js"
 import {generateProductErrorInfo} from "../helpers/middlewares/errors/info.js"
 import {generateProductAddErrorInfo} from "../helpers/middlewares/errors/info.js"
-
+//
 export const getProducts = async (req,res) => {
     console.log(`consulta con limit page category name sort}`);
     const {
