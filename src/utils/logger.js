@@ -21,7 +21,6 @@ const logger = winston.createLogger({
     transports: [
         new winston.transports.Console({
             level: 'info',
-            filename: './info.log',
             format: winston.format.combine(
                 winston.format.colorize({ color: customLevelOpt.colors }), //Color correspondiente segun el tipo de logger   
                 winston.format.simple()

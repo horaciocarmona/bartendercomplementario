@@ -77,7 +77,7 @@ switch (parseInt(process.env.SELECTEDBDD)) {
  
 }
   
-// uso de logger
+/// uso de logger
 // app.get("/", (req, res) => {
 //     req.logger.warning("Alerta!")
 //     res.send("Hola")
